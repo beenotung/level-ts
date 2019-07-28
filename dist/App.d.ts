@@ -1,4 +1,4 @@
-export declare class Level<DefaultType = any> {
+export default class Level<DefaultType = any> {
     private DB;
     constructor(path: string);
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;

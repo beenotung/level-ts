@@ -63,5 +63,5 @@ class Level {
         });
     }
 }
-exports.Level = Level;
+exports.default = Level;
 //# sourceMappingURL=App.js.map

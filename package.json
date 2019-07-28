@@ -16,7 +16,8 @@
   "scripts": {
     "start": "node --inspect=5858 -r ts-node/register ./src/App.ts",
     "start:watch": "nodemon",
-    "build": "tsc"
+    "build": "tsc",
+    "publish": "git push"
   },
   "config": {
     "commitizen": {
