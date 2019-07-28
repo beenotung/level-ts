@@ -1,14 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = require("path");
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires
 const level = require('level');
 const instances = {};
+let rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
 class Level {
     constructor(path) {
-        this.DB = instances[path]
-            ? instances[path]
-            : instances[path] = level(path);
+        const fullpath = path_1.isAbsolute(path) ? path : path_1.resolve(rootFolder, path);
+        this.DB = instances[fullpath]
+            ? instances[fullpath]
+            : instances[fullpath] = level(fullpath);
+    }
+    static setRoot(path) {
+        rootFolder = path;
     }
     async find(func) {
         const all = await this.all();

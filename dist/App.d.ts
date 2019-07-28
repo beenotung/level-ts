@@ -1,4 +1,5 @@
 export default class Level<DefaultType = any> {
+    static setRoot(path: string): void;
     private DB;
     constructor(path: string);
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
