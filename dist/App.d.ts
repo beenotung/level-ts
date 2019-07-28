@@ -32,4 +32,4 @@ interface IStreamOptions {
     limit: number;
 }
 export {};
-//# sourceMappingURL=Level.d.ts.map
+//# sourceMappingURL=App.d.ts.map
