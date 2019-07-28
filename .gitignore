@@ -1,0 +1,11 @@
+# Package files
+node_modules
+
+# Lockfiles
+*.log
+yarn.lock
+package-*
+
+# Local files
+# dist
+*.local
