@@ -16,8 +16,9 @@
   "scripts": {
     "start": "node --inspect=5858 -r ts-node/register ./src/App.ts",
     "start:watch": "nodemon",
+    "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "publish": "git checkout master && git merge development && yarn build && git add . && git add -f dist && git commit -m \":rocket: Publish new version\" && git push"
+    "deploy": "git checkout master && git merge development && yarn build && git add . && git add -f dist && git commit -m \":rocket: Publish new version\" && git push"
   },
   "config": {
     "commitizen": {
@@ -37,7 +38,7 @@
     "ext": "ts"
   },
   "name": "level",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The hard typed level module",
   "repository": "git@git.volta.im:Ryan/level.git",
   "author": "Ryan <ryan@ryanair.com>",
