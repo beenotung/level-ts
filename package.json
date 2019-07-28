@@ -34,5 +34,11 @@
     ],
     "exec": "yarn start",
     "ext": "ts"
-  }
+  },
+  "name": "level",
+  "version": "1.0.0",
+  "description": "The hard typed level module",
+  "repository": "git@git.volta.im:Ryan/level.git",
+  "author": "Ryan <ryan@ryanair.com>",
+  "license": "MIT"
 }
