@@ -17,7 +17,7 @@
     "start": "node --inspect=5858 -r ts-node/register ./src/App.ts",
     "start:watch": "nodemon",
     "build": "tsc",
-    "publish": "git push"
+    "publish": "git checkout master && git merge development && yarn build && git add . && git add -f dist && git commit -m \":rocket: Publish new version\" && git push"
   },
   "config": {
     "commitizen": {
