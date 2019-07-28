@@ -6,7 +6,7 @@ const instances: {
   [path: string]: any;
 } = {};
 
-export class Level<DefaultType = any> {
+export default class Level<DefaultType = any> {
   private DB: any;
   constructor(path: string) {
     this.DB = instances[path]
