@@ -1,17 +1,26 @@
+import { resolve, isAbsolute } from 'path';
+
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires
 const level = require('level');
 
 const instances: {
-  [path: string]: any;
+  [fullpath: string]: any;
 } = {};
 
+let rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
+
 export default class Level<DefaultType = any> {
+  public static setRoot(path: string) {
+    rootFolder = path;
+  }
+
   private DB: any;
   constructor(path: string) {
-    this.DB = instances[path]
-      ? instances[path]
-      : instances[path] = level(path);
+    const fullpath = isAbsolute(path) ? path : resolve(rootFolder, path);
+    this.DB = instances[fullpath]
+      ? instances[fullpath]
+      : instances[fullpath] = level(fullpath);
   }
 
   public async find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined> {
