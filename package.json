@@ -19,7 +19,7 @@
     "start:watch": "nodemon",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "deploy": "git checkout master && git merge development -s theirs -m \":twisted_rightwards_arrows: Merge with Development\" && yarn build && git add . && git add -f dist && git commit -m \":rocket: Building for Deployment\" || true && git push && git checkout development"
+    "deploy": "git checkout master && git merge development -m \":twisted_rightwards_arrows: Merge with Development\" && yarn build && git add . && git add -f dist && git commit -m \":rocket: Building for Deployment\" || true && git push && git checkout development"
   },
   "config": {
     "commitizen": {
