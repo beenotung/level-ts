@@ -7,5 +7,5 @@ yarn.lock
 package-*
 
 # Local files
-dist
+dist/
 *.local
