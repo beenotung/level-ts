@@ -35,6 +35,18 @@ export default class Level<DefaultType = any> {
     });
   }
 
+  public get chain() {
+    // tslint:disable-next-line: no-this-assignment
+    const instance = this;
+    const promises: Array<Promise<any>> = [];
+    return {
+      get(key: string) { promises.push(instance.get(key)); return this; },
+      del(key: string) { promises.push(instance.del(key)); return this; },
+      put(key: string, value: DefaultType) { promises.push(instance.put(key, value)); return this; },
+      finish() { return Promise.all(promises); },
+    };
+  }
+
   public async get(key: string): Promise<DefaultType> {
     return JSON.parse(await this.DB.get(key));
   }
