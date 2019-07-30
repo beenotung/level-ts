@@ -39,7 +39,7 @@ const instances: {
   [fullpath: string]: any;
 } = {};
 
-export default class LevelGraph {
+export class LevelGraph {
   public static rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
   public static setRoot(path: string) {
     this.rootFolder = path;
