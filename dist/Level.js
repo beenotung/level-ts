@@ -26,6 +26,17 @@ class Level {
                 .then(() => res(true));
         });
     }
+    get chain() {
+        // tslint:disable-next-line: no-this-assignment
+        const instance = this;
+        const promises = [];
+        return {
+            get(key) { promises.push(instance.get(key)); return this; },
+            del(key) { promises.push(instance.del(key)); return this; },
+            put(key, value) { promises.push(instance.put(key, value)); return this; },
+            finish() { return Promise.all(promises); },
+        };
+    }
     async get(key) {
         return JSON.parse(await this.DB.get(key));
     }

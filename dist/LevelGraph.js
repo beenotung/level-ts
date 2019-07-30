@@ -15,19 +15,30 @@ class LevelGraph {
     static setRoot(path) {
         this.rootFolder = path;
     }
-    put(obj) {
+    get chain() {
+        // tslint:disable-next-line: no-this-assignment
+        const instance = this;
+        const promises = [];
+        return {
+            put(triple) { promises.push(instance.put(triple)); return this; },
+            del(triple) { promises.push(instance.del(triple)); return this; },
+            get(triple) { promises.push(instance.get(triple)); return this; },
+            finish() { return Promise.all(promises); },
+        };
+    }
+    put(triple) {
         return new Promise((res, rej) => {
-            this.DB.put(obj, (err) => err ? rej(err) : res());
+            this.DB.put(triple, (err) => err ? rej(err) : res());
         });
     }
-    get(obj) {
+    get(triple) {
         return new Promise((res, rej) => {
-            this.DB.get(obj, (err, list) => err ? rej(err) : res(list));
+            this.DB.get(triple, (err, list) => err ? rej(err) : res(list));
         });
     }
-    del(obj) {
+    del(triple) {
         return new Promise((res, rej) => {
-            this.DB.del(obj, (err) => err ? rej(err) : res());
+            this.DB.del(triple, (err) => err ? rej(err) : res());
         });
     }
     v(name) { return this.DB.v(name); }

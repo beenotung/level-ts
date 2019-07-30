@@ -5,6 +5,12 @@ export default class Level<DefaultType = any> {
     constructor(path: string);
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
     exists(key: string): Promise<boolean>;
+    readonly chain: {
+        get(key: string): any;
+        del(key: string): any;
+        put(key: string, value: DefaultType): any;
+        finish(): Promise<any[]>;
+    };
     get(key: string): Promise<DefaultType>;
     put(key: string, value: DefaultType): Promise<DefaultType>;
     del(key: string): Promise<void>;

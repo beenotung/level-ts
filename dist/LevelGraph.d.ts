@@ -4,7 +4,7 @@ interface ITriple {
     object: string;
     [key: string]: any;
 }
-interface IGetTriple extends ITriple {
+interface IGetTriple extends Partial<ITriple> {
     limit?: number;
     offset?: number;
     reverse?: boolean;
@@ -18,11 +18,7 @@ interface IWalkOptions {
     materialized?: {
         [key: string]: string | GraphVar;
     };
-    filter?: (this: any, solution: {
-        [key: string]: any;
-    }, callback: (error: string | null, solution: {
-        [key: string]: any;
-    }) => void) => void;
+    filter?: (solution: any, callback: (error: string | null, solution?: any) => void) => void;
 }
 interface IWalkPath {
     subject: string | GraphVar;
@@ -35,9 +31,15 @@ export declare class LevelGraph {
     static setRoot(path: string): void;
     private DB;
     constructor(path: string);
-    put(obj: ITriple): Promise<void>;
-    get(obj: IGetTriple): Promise<ITriple[]>;
-    del(obj: ITriple): Promise<void>;
+    readonly chain: {
+        put(triple: ITriple): any;
+        del(triple: ITriple): any;
+        get(triple: IGetTriple): any;
+        finish(): Promise<any[]>;
+    };
+    put(triple: ITriple): Promise<void>;
+    get(triple: IGetTriple): Promise<ITriple[]>;
+    del(triple: ITriple): Promise<void>;
     v(name: string): GraphVar;
     walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{
         [key: string]: any;
