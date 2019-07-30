@@ -71,7 +71,7 @@ export default class LevelGraph {
     });
   }
 
-  public v(name: string): GraphVar { return this.DB.v(); }
+  public v(name: string): GraphVar { return this.DB.v(name); }
 
   public walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{ [key: string]: any }>> {
     return new Promise((res, rej) => {
