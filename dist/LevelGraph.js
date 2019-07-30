@@ -30,7 +30,7 @@ class LevelGraph {
             this.DB.del(obj, (err) => err ? rej(err) : res());
         });
     }
-    v(name) { return this.DB.v(); }
+    v(name) { return this.DB.v(name); }
     walk(options, ...path) {
         return new Promise((res, rej) => {
             if (!options.materialized && !options.filter && !options.limit && !options.offset) {
