@@ -37,9 +37,9 @@ export declare class LevelGraph {
         get(triple: IGetTriple): any;
         finish(): Promise<any[]>;
     };
-    put(triple: ITriple): Promise<void>;
+    put(triple: ITriple | ITriple[]): Promise<void>;
+    del(triple: ITriple | ITriple[]): Promise<void>;
     get(triple: IGetTriple): Promise<ITriple[]>;
-    del(triple: ITriple): Promise<void>;
     v(name: string): GraphVar;
     walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{
         [key: string]: any;

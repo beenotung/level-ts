@@ -28,17 +28,23 @@ class LevelGraph {
     }
     put(triple) {
         return new Promise((res, rej) => {
-            this.DB.put(triple, (err) => err ? rej(err) : res());
+            if (Array.isArray(triple))
+                Promise.all(triple.map((t) => this.put(t))).catch((e) => rej(e)).then(() => res());
+            else
+                this.DB.put(triple, (err) => err ? rej(err) : res());
+        });
+    }
+    del(triple) {
+        return new Promise((res, rej) => {
+            if (Array.isArray(triple))
+                Promise.all(triple.map((t) => this.del(t))).catch((e) => rej(e)).then(() => res());
+            else
+                this.DB.del(triple, (err) => err ? rej(err) : res());
         });
     }
     get(triple) {
         return new Promise((res, rej) => {
             this.DB.get(triple, (err, list) => err ? rej(err) : res(list));
-        });
-    }
-    del(triple) {
-        return new Promise((res, rej) => {
-            this.DB.del(triple, (err) => err ? rej(err) : res());
         });
     }
     v(name) { return this.DB.v(name); }
