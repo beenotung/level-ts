@@ -65,21 +65,23 @@ export class LevelGraph {
     };
   }
 
-  public put(triple: ITriple): Promise<void> {
+  public put(triple: ITriple | ITriple[]): Promise<void> {
     return new Promise((res, rej) => {
-      this.DB.put(triple, (err: any) => err ? rej(err) : res());
+      if (Array.isArray(triple)) Promise.all(triple.map((t) => this.put(t))).catch((e) => rej(e)).then(() => res());
+      else this.DB.put(triple, (err: any) => err ? rej(err) : res());
+    });
+  }
+
+  public del(triple: ITriple | ITriple[]): Promise<void> {
+    return new Promise((res, rej) => {
+      if (Array.isArray(triple)) Promise.all(triple.map((t) => this.del(t))).catch((e) => rej(e)).then(() => res());
+      else this.DB.del(triple, (err: any) => err ? rej(err) : res());
     });
   }
 
   public get(triple: IGetTriple): Promise<ITriple[]> {
     return new Promise((res, rej) => {
       this.DB.get(triple, (err: any, list: any[]) => err ? rej(err) : res(list));
-    });
-  }
-
-  public del(triple: ITriple): Promise<void> {
-    return new Promise((res, rej) => {
-      this.DB.del(triple, (err: any) => err ? rej(err) : res());
     });
   }
 
