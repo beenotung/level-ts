@@ -7,7 +7,7 @@ interface ITriple {
   [key: string]: any;
 }
 
-interface IGetTriple extends ITriple {
+interface IGetTriple extends Partial<ITriple> {
   limit?: number;
   offset?: number;
   reverse?: boolean;
@@ -22,7 +22,7 @@ interface IWalkOptions {
   materialized?: {
     [key: string]: string | GraphVar;
   };
-  filter?: (this: any, solution: { [key: string]: any }, callback: (error: string | null, solution: { [key: string]: any }) => void) => void;
+  filter?: (solution: any, callback: (error: string | null, solution?: any) => void) => void;
 }
 interface IWalkPath {
   subject: string | GraphVar;
@@ -53,21 +53,33 @@ export class LevelGraph {
       : instances[fullpath] = levelgraph(level(fullpath));
   }
 
-  public put(obj: ITriple): Promise<void> {
+  public get chain() {
+    // tslint:disable-next-line: no-this-assignment
+    const instance = this;
+    const promises: Array<Promise<any>> = [];
+    return {
+      put(triple: ITriple) { promises.push(instance.put(triple)); return this; },
+      del(triple: ITriple) { promises.push(instance.del(triple)); return this; },
+      get(triple: IGetTriple) { promises.push(instance.get(triple)); return this; },
+      finish() { return Promise.all(promises); },
+    };
+  }
+
+  public put(triple: ITriple): Promise<void> {
     return new Promise((res, rej) => {
-      this.DB.put(obj, (err: any) => err ? rej(err) : res());
+      this.DB.put(triple, (err: any) => err ? rej(err) : res());
     });
   }
 
-  public get(obj: IGetTriple): Promise<ITriple[]> {
+  public get(triple: IGetTriple): Promise<ITriple[]> {
     return new Promise((res, rej) => {
-      this.DB.get(obj, (err: any, list: any[]) => err ? rej(err) : res(list));
+      this.DB.get(triple, (err: any, list: any[]) => err ? rej(err) : res(list));
     });
   }
 
-  public del(obj: ITriple): Promise<void> {
+  public del(triple: ITriple): Promise<void> {
     return new Promise((res, rej) => {
-      this.DB.del(obj, (err: any) => err ? rej(err) : res());
+      this.DB.del(triple, (err: any) => err ? rej(err) : res());
     });
   }
 
