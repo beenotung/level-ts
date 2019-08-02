@@ -1,7 +1,9 @@
-interface ITriple {
+interface ITripleBase {
     subject: string;
     predicate: string;
     object: string;
+}
+interface ITriple extends ITripleBase {
     [key: string]: any;
 }
 interface IGetTriple extends Partial<ITriple> {
@@ -40,6 +42,7 @@ export declare class LevelGraph {
     put(triple: ITriple | ITriple[]): Promise<void>;
     del(triple: ITriple | ITriple[]): Promise<void>;
     get(triple: IGetTriple): Promise<ITriple[]>;
+    find(subject: string | null, predicate: string | null, object?: string | null): Promise<string | null>;
     v(name: string): GraphVar;
     walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{
         [key: string]: any;

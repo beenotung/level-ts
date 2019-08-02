@@ -47,6 +47,27 @@ class LevelGraph {
             this.DB.get(triple, (err, list) => err ? rej(err) : res(list));
         });
     }
+    async find(subject, predicate, object) {
+        let returnkey;
+        if (Array(arguments).filter((v) => v === null).length > 1)
+            throw new Error('Find( ) cannot have more than 1 null argument');
+        else if (!subject)
+            returnkey = 'subject';
+        else if (!predicate)
+            returnkey = 'predicate';
+        else if (!object)
+            returnkey = 'object';
+        else
+            throw new Error('No nulled argument given. No return specified');
+        const [obj] = await this.get({
+            subject: subject || undefined,
+            predicate: predicate || undefined,
+            object: object || undefined,
+        });
+        if (!obj)
+            return null;
+        return obj[returnkey];
+    }
     v(name) { return this.DB.v(name); }
     walk(options, ...path) {
         return new Promise((res, rej) => {

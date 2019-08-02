@@ -44,6 +44,7 @@ it('Chaining actions', () => {
         .put({ subject: 'juice', predicate: 'contains', object: 'paper' })
         .put({ subject: 'book', predicate: 'contains', object: 'paper' })
         .put({ subject: 'book', predicate: 'contains', object: 'leather' })
+        .put({ subject: 'Ryan', predicate: 'lastname', object: 'Awesome' })
         .finish()).resolves.toBeDefined();
 });
 it('Walking data', () => {
@@ -63,5 +64,8 @@ it('Walking data', () => {
         { from: 'juice', with: 'fruit' },
         { from: 'juice', with: 'paper' }
     ]);
+});
+it('Simple find( )', () => {
+    return expect(db.find(null, 'lastname', 'Awesome')).resolves.toBe('Ryan');
 });
 //# sourceMappingURL=LevelGraph.test.js.map
