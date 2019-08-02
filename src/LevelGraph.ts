@@ -1,9 +1,12 @@
 import { isAbsolute, resolve } from 'path';
 
-interface ITriple {
+interface ITripleBase {
   subject: string;
   predicate: string;
   object: string;
+}
+
+interface ITriple extends ITripleBase {
   [key: string]: any;
 }
 
@@ -83,6 +86,22 @@ export class LevelGraph {
     return new Promise((res, rej) => {
       this.DB.get(triple, (err: any, list: any[]) => err ? rej(err) : res(list));
     });
+  }
+
+  public async find(subject: string | null, predicate: string | null, object?: string | null) {
+    let returnkey: keyof ITripleBase;
+    if (Array(arguments).filter((v) => v === null).length > 1) throw new Error('Find( ) cannot have more than 1 null argument');
+    else if (!subject) returnkey = 'subject';
+    else if (!predicate) returnkey = 'predicate';
+    else if (!object) returnkey = 'object';
+    else throw new Error('No nulled argument given. No return specified');
+    const [obj] = await this.get({
+      subject: subject || undefined,
+      predicate: predicate || undefined,
+      object: object || undefined,
+    });
+    if (!obj) return null;
+    return obj[returnkey];
   }
 
   public v(name: string): GraphVar { return this.DB.v(name); }
