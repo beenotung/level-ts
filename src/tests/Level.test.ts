@@ -1,12 +1,13 @@
 import Level from '../Level';
 import { rmdirSync, mkdirSync } from 'fs';
+import { resolve } from 'path';
 
 interface IObj {
   test: 'jest';
 }
 
 Level.setRoot('temp_test.local');
-mkdirSync('temp_test.local');
+// mkdirSync('temp_test.local');
 let db: Level<IObj>;
 
 test('Level database creation', () => {
@@ -51,4 +52,10 @@ test('Streaming dataset', async () => {
 
 test('Reading all dataset', async () => {
   return expect(db.all()).resolves.toHaveLength(5);
+});
+
+test('Using an already created db inside constructor', async () => {
+  const database = require('level')(resolve('temp_test.local', 'level-db-2'));
+  const instance = new Level(database);
+  return expect(instance.put('fuck', 'you')).resolves.toBe('you');
 });

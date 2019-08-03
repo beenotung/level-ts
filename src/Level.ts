@@ -15,11 +15,19 @@ export default class Level<DefaultType = any> {
   }
 
   private DB: any;
-  constructor(path: string) {
-    const fullpath = isAbsolute(path) ? path : resolve(Level.rootFolder, path);
-    this.DB = instances[fullpath]
-      ? instances[fullpath]
-      : instances[fullpath] = level(fullpath);
+
+  constructor(database: object)
+  // tslint:disable-next-line: unified-signatures
+  constructor(path: string)
+  constructor(argument: string | any) {
+    if (typeof argument === 'string') {
+      const fullpath = isAbsolute(argument) ? argument : resolve(Level.rootFolder, argument);
+      this.DB = instances[fullpath]
+        ? instances[fullpath]
+        : instances[fullpath] = level(fullpath);
+    } else if (!!argument.db && !!argument._db && !!argument.options) {
+      this.DB = argument;
+    }
   }
 
   public async find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined> {
