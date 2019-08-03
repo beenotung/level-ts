@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Level_1 = __importDefault(require("../Level"));
-const fs_1 = require("fs");
+const path_1 = require("path");
 Level_1.default.setRoot('temp_test.local');
-fs_1.mkdirSync('temp_test.local');
+// mkdirSync('temp_test.local');
 let db;
 test('Level database creation', () => {
     db = new Level_1.default('level-db');
@@ -42,5 +42,10 @@ test('Streaming dataset', async () => {
 });
 test('Reading all dataset', async () => {
     return expect(db.all()).resolves.toHaveLength(5);
+});
+test('Using an already created db inside constructor', async () => {
+    const database = require('level')(path_1.resolve('temp_test.local', 'level-db-2'));
+    const instance = new Level_1.default(database);
+    return expect(instance.put('fuck', 'you')).resolves.toBe('you');
 });
 //# sourceMappingURL=Level.test.js.map

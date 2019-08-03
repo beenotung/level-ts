@@ -2,6 +2,7 @@ export default class Level<DefaultType = any> {
     static rootFolder: string;
     static setRoot(path: string): void;
     private DB;
+    constructor(database: object);
     constructor(path: string);
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
     exists(key: string): Promise<boolean>;

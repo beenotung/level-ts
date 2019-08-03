@@ -6,11 +6,16 @@ const path_1 = require("path");
 const level = require('level');
 const instances = {};
 class Level {
-    constructor(path) {
-        const fullpath = path_1.isAbsolute(path) ? path : path_1.resolve(Level.rootFolder, path);
-        this.DB = instances[fullpath]
-            ? instances[fullpath]
-            : instances[fullpath] = level(fullpath);
+    constructor(argument) {
+        if (typeof argument === 'string') {
+            const fullpath = path_1.isAbsolute(argument) ? argument : path_1.resolve(Level.rootFolder, argument);
+            this.DB = instances[fullpath]
+                ? instances[fullpath]
+                : instances[fullpath] = level(fullpath);
+        }
+        else if (!!argument.db && !!argument._db && !!argument.options) {
+            this.DB = argument;
+        }
     }
     static setRoot(path) {
         this.rootFolder = path;
