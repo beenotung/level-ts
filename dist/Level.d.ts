@@ -5,6 +5,7 @@ export default class Level<DefaultType = any> {
     constructor(database: object);
     constructor(path: string);
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
+    filter(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType[]>;
     exists(key: string): Promise<boolean>;
     readonly chain: {
         get(key: string): any;

@@ -24,6 +24,10 @@ class Level {
         const all = await this.all();
         return all.find(func);
     }
+    async filter(func) {
+        const all = await this.all();
+        return all.filter(func);
+    }
     exists(key) {
         return new Promise((res, rej) => {
             this.DB.get(key)
