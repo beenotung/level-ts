@@ -35,6 +35,11 @@ export default class Level<DefaultType = any> {
     return all.find(func as any);
   }
 
+  public async filter(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined) {
+    const all = await this.all();
+    return all.filter(func);
+  }
+
   public exists(key: string): Promise<boolean> {
     return new Promise((res, rej) => {
       this.DB.get(key)
