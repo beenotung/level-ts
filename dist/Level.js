@@ -13,8 +13,11 @@ class Level {
                 ? instances[fullpath]
                 : instances[fullpath] = level(fullpath);
         }
-        else if (!!argument.db && !!argument._db && !!argument.options) {
+        else if (!!argument.get && !!argument.put && !!argument.createReadStream && !!argument.del) {
             this.DB = argument;
+        }
+        else {
+            throw new Error('No valid database instance or path provided');
         }
     }
     static setRoot(path) {
