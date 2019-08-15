@@ -89,27 +89,24 @@ export default class Level<DefaultType = any> {
   }
 
   public async all(): Promise<DefaultType[]> {
-    return this.stream({ gte: ``, lte: `\xff`, keys: false }) as any;
+    return this.stream({ all: '', keys: false });
   }
 
-  public stream(opts: Partial<IStreamOptions>, returntype: 'keys'): Promise<string[]>;
-  public stream(opts: Partial<IStreamOptions>, returntype: 'values'): Promise<DefaultType[]>;
-  public stream(opts: Partial<IStreamOptions>, returntype?: 'both'): Promise<Array<{ key: string; value: DefaultType }>>;
-  public stream(opts: Partial<IStreamOptions>, returntype?: 'keys' | 'values' | 'both'): Promise<any[]> {
+  public stream(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
+  public stream(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<DefaultType[]>;
+  public stream(opts: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: DefaultType }>>;
+  public stream(opts: Partial<IStreamOptions>): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const returnArray: any[] = [];
       if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
       this.DB
         .createReadStream(opts)
-        .on('data', ({ key, value }: { key: string; value: string }) => returnArray.push({ key, value: JSON.parse(value) }))
+        .on('data', (data: any) => {
+          if (opts.values || opts.values === undefined) data.value = JSON.parse(data.value);
+          returnArray.push(data);
+        })
         .on('error', reject)
-        .on('end', () => {
-          switch (returntype) {
-            case 'keys': resolve(returnArray.map((v) => v.key)); break;
-            case 'values': resolve(returnArray.map((v) => v.value)); break;
-            default: resolve(returnArray); break;
-          }
-        });
+        .on('end', () => resolve(returnArray));
     });
   }
 }
