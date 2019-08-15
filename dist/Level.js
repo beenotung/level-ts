@@ -71,6 +71,8 @@ class Level {
     stream(opts, returntype) {
         return new Promise((resolve, reject) => {
             const returnArray = [];
+            if (opts.all)
+                Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
             this.DB
                 .createReadStream(opts)
                 .on('data', ({ key, value }) => returnArray.push({ key, value: JSON.parse(value) }))
