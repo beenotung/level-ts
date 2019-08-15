@@ -8,6 +8,13 @@ const instances: {
   [fullpath: string]: any;
 } = {};
 
+interface IChainObject<InputType> {
+  del(key: string): IChainObject<InputType>;
+  get(key: string): IChainObject<InputType>;
+  put(key: string, value: InputType): IChainObject<InputType>;
+  finish(): Promise<InputType[]>;
+}
+
 export default class Level<DefaultType = any> {
   public static rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
   public static setRoot(path: string) {
@@ -50,7 +57,7 @@ export default class Level<DefaultType = any> {
     });
   }
 
-  public get chain() {
+  public get chain(): IChainObject<DefaultType> {
     // tslint:disable-next-line: no-this-assignment
     const instance = this;
     const promises: Array<Promise<any>> = [];
@@ -58,7 +65,7 @@ export default class Level<DefaultType = any> {
       get(key: string) { promises.push(instance.get(key)); return this; },
       del(key: string) { promises.push(instance.del(key)); return this; },
       put(key: string, value: DefaultType) { promises.push(instance.put(key, value)); return this; },
-      finish() { return Promise.all(promises); },
+      async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
     };
   }
 
