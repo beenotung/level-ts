@@ -65,30 +65,22 @@ class Level {
         return newConfig;
     }
     async all() {
-        return this.stream({ gte: ``, lte: `\xff`, keys: false });
+        return this.stream({ all: '', keys: false });
     }
-    stream(opts, returntype) {
+    stream(opts) {
         return new Promise((resolve, reject) => {
             const returnArray = [];
             if (opts.all)
                 Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
             this.DB
                 .createReadStream(opts)
-                .on('data', ({ key, value }) => returnArray.push({ key, value: JSON.parse(value) }))
+                .on('data', (data) => {
+                if (opts.values || opts.values === undefined)
+                    data.value = JSON.parse(data.value);
+                returnArray.push(data);
+            })
                 .on('error', reject)
-                .on('end', () => {
-                switch (returntype) {
-                    case 'keys':
-                        resolve(returnArray.map((v) => v.key));
-                        break;
-                    case 'values':
-                        resolve(returnArray.map((v) => v.value));
-                        break;
-                    default:
-                        resolve(returnArray);
-                        break;
-                }
-            });
+                .on('end', () => resolve(returnArray));
         });
     }
 }

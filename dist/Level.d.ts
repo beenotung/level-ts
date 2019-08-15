@@ -19,9 +19,18 @@ export default class Level<DefaultType = any> {
     del(key: string): Promise<void>;
     merge(key: string, config: Partial<DefaultType>): Promise<DefaultType>;
     all(): Promise<DefaultType[]>;
-    stream(opts: Partial<IStreamOptions>, returntype: 'keys'): Promise<string[]>;
-    stream(opts: Partial<IStreamOptions>, returntype: 'values'): Promise<DefaultType[]>;
-    stream(opts: Partial<IStreamOptions>, returntype?: 'both'): Promise<Array<{
+    stream(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+    }): Promise<string[]>;
+    stream(opts: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+    }): Promise<DefaultType[]>;
+    stream(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+    }): Promise<Array<{
         key: string;
         value: DefaultType;
     }>>;
