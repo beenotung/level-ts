@@ -64,9 +64,8 @@ class Level {
         await this.put(key, newConfig);
         return newConfig;
     }
-    async all(keys) {
-        const array = await this.stream({ gte: ``, lte: `\xff` });
-        return array;
+    async all() {
+        return this.stream({ gte: ``, lte: `\xff`, keys: false });
     }
     stream(opts, returntype) {
         return new Promise((resolve, reject) => {
@@ -79,10 +78,10 @@ class Level {
                 .on('error', reject)
                 .on('end', () => {
                 switch (returntype) {
-                    case 'key':
+                    case 'keys':
                         resolve(returnArray.map((v) => v.key));
                         break;
-                    case 'value':
+                    case 'values':
                         resolve(returnArray.map((v) => v.value));
                         break;
                     default:
