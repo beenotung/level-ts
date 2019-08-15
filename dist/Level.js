@@ -64,9 +64,9 @@ class Level {
         await this.put(key, newConfig);
         return newConfig;
     }
-    async all(key = false) {
+    async all(keys) {
         const array = await this.stream({ gte: ``, lte: `\xff` });
-        return key ? array : array.map((v) => v.value);
+        return array;
     }
     stream(opts, returntype) {
         return new Promise((resolve, reject) => {
