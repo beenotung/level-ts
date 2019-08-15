@@ -65,7 +65,7 @@ class Level {
         return newConfig;
     }
     async all() {
-        return this.stream({ all: '', keys: false });
+        return this.stream({ keys: false });
     }
     stream(opts) {
         return new Promise((resolve, reject) => {
@@ -75,8 +75,10 @@ class Level {
             this.DB
                 .createReadStream(opts)
                 .on('data', (data) => {
-                if (opts.values || opts.values === undefined)
+                if (opts.values !== false && opts.keys !== false)
                     data.value = JSON.parse(data.value);
+                if (opts.keys === false)
+                    data = JSON.parse(data);
                 returnArray.push(data);
             })
                 .on('error', reject)
