@@ -88,12 +88,8 @@ export default class Level<DefaultType = any> {
     return newConfig;
   }
 
-  public async all(returntype?: 'values'): Promise<DefaultType[]>;
-  public async all(returntype: 'keys'): Promise<string[]>;
-  public async all(returntype: 'both'): Promise<Array<{ key: string; value: DefaultType }>>;
-  public async all(returntype = 'values'): Promise<any> {
-    const array = await this.stream({ gte: ``, lte: `\xff` }, returntype);
-    return array;
+  public async all(): Promise<DefaultType[]> {
+    return this.stream({ gte: ``, lte: `\xff`, keys: false }) as any;
   }
 
   public stream(opts: Partial<IStreamOptions>, returntype: 'keys'): Promise<string[]>;
