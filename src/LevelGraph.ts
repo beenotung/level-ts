@@ -36,6 +36,13 @@ interface IWalkPath {
   filter?: (this: any, triple: ITriple) => boolean;
 }
 
+interface IChainObject {
+  put(triple: ITriple): IChainObject;
+  del(triple: ITriple): IChainObject;
+  get(triple: IGetTriple): IChainObject;
+  finish(): Promise<IGetTriple[]>;
+}
+
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires one-variable-per-declaration
 const level = require('level'), levelgraph = require('levelgraph');
@@ -58,7 +65,7 @@ export class LevelGraph {
       : instances[fullpath] = levelgraph(level(fullpath));
   }
 
-  public get chain() {
+  public get chain(): IChainObject {
     // tslint:disable-next-line: no-this-assignment
     const instance = this;
     const promises: Array<Promise<any>> = [];
@@ -66,7 +73,7 @@ export class LevelGraph {
       put(triple: ITriple) { promises.push(instance.put(triple)); return this; },
       del(triple: ITriple) { promises.push(instance.del(triple)); return this; },
       get(triple: IGetTriple) { promises.push(instance.get(triple)); return this; },
-      finish() { return Promise.all(promises); },
+      async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
     };
   }
 
