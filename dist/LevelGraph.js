@@ -23,7 +23,7 @@ class LevelGraph {
             put(triple) { promises.push(instance.put(triple)); return this; },
             del(triple) { promises.push(instance.del(triple)); return this; },
             get(triple) { promises.push(instance.get(triple)); return this; },
-            finish() { return Promise.all(promises); },
+            async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
         };
     }
     put(triple) {

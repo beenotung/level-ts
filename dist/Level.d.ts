@@ -1,3 +1,9 @@
+interface IChainObject<InputType> {
+    del(key: string): IChainObject<InputType>;
+    get(key: string): IChainObject<InputType>;
+    put(key: string, value: InputType): IChainObject<InputType>;
+    finish(): Promise<InputType[]>;
+}
 export default class Level<DefaultType = any> {
     static rootFolder: string;
     static setRoot(path: string): void;
@@ -7,12 +13,7 @@ export default class Level<DefaultType = any> {
     find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
     filter(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType[]>;
     exists(key: string): Promise<boolean>;
-    readonly chain: {
-        get(key: string): any;
-        del(key: string): any;
-        put(key: string, value: DefaultType): any;
-        finish(): Promise<any[]>;
-    };
+    readonly chain: IChainObject<DefaultType>;
     get(key: string): Promise<DefaultType>;
     put(key: string, value: DefaultType): Promise<DefaultType>;
     del(key: string): Promise<void>;

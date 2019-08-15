@@ -46,7 +46,7 @@ class Level {
             get(key) { promises.push(instance.get(key)); return this; },
             del(key) { promises.push(instance.del(key)); return this; },
             put(key, value) { promises.push(instance.put(key, value)); return this; },
-            finish() { return Promise.all(promises); },
+            async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
         };
     }
     async get(key) {

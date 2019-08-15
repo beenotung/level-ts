@@ -29,17 +29,18 @@ interface IWalkPath {
     object: string | GraphVar;
     filter?: (this: any, triple: ITriple) => boolean;
 }
+interface IChainObject {
+    put(triple: ITriple): IChainObject;
+    del(triple: ITriple): IChainObject;
+    get(triple: IGetTriple): IChainObject;
+    finish(): Promise<IGetTriple[]>;
+}
 export declare class LevelGraph {
     static rootFolder: string;
     static setRoot(path: string): void;
     private DB;
     constructor(path: string);
-    readonly chain: {
-        put(triple: ITriple): any;
-        del(triple: ITriple): any;
-        get(triple: IGetTriple): any;
-        finish(): Promise<any[]>;
-    };
+    readonly chain: IChainObject;
     put(triple: ITriple | ITriple[]): Promise<void>;
     del(triple: ITriple | ITriple[]): Promise<void>;
     get(triple: IGetTriple): Promise<ITriple[]>;
