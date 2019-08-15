@@ -91,15 +91,15 @@ export default class Level<DefaultType = any> {
   public async all(returntype?: 'values'): Promise<DefaultType[]>;
   public async all(returntype: 'keys'): Promise<string[]>;
   public async all(returntype: 'both'): Promise<Array<{ key: string; value: DefaultType }>>;
-  public async all(keys?: string): Promise<any> {
-    const array = await this.stream({ gte: ``, lte: `\xff` });
+  public async all(returntype = 'values'): Promise<any> {
+    const array = await this.stream({ gte: ``, lte: `\xff` }, returntype);
     return array;
   }
 
-  public stream(opts: Partial<IStreamOptions>, returntype: 'key'): Promise<string[]>;
-  public stream(opts: Partial<IStreamOptions>, returntype: 'value'): Promise<DefaultType[]>;
+  public stream(opts: Partial<IStreamOptions>, returntype: 'keys'): Promise<string[]>;
+  public stream(opts: Partial<IStreamOptions>, returntype: 'values'): Promise<DefaultType[]>;
   public stream(opts: Partial<IStreamOptions>, returntype?: 'both'): Promise<Array<{ key: string; value: DefaultType }>>;
-  public stream(opts: Partial<IStreamOptions>, returntype?: 'key' | 'value' | 'both'): Promise<any[]> {
+  public stream(opts: Partial<IStreamOptions>, returntype?: 'keys' | 'values' | 'both'): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const returnArray: any[] = [];
       if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
@@ -109,8 +109,8 @@ export default class Level<DefaultType = any> {
         .on('error', reject)
         .on('end', () => {
           switch (returntype) {
-            case 'key': resolve(returnArray.map((v) => v.key)); break;
-            case 'value': resolve(returnArray.map((v) => v.value)); break;
+            case 'keys': resolve(returnArray.map((v) => v.key)); break;
+            case 'values': resolve(returnArray.map((v) => v.value)); break;
             default: resolve(returnArray); break;
           }
         });
