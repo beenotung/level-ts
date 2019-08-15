@@ -1,7 +1,8 @@
+declare type InputTypeable = string | number;
 interface ITripleBase {
-    subject: string;
-    predicate: string;
-    object: string;
+    subject: InputTypeable;
+    predicate: InputTypeable;
+    object: InputTypeable;
 }
 interface ITriple extends ITripleBase {
     [key: string]: any;
@@ -42,7 +43,7 @@ export declare class LevelGraph {
     put(triple: ITriple | ITriple[]): Promise<void>;
     del(triple: ITriple | ITriple[]): Promise<void>;
     get(triple: IGetTriple): Promise<ITriple[]>;
-    find(subject: string | null, predicate: string | null, object?: string | null): Promise<string | null>;
+    find(subject: string | null, predicate: string | null, object?: string | null): Promise<string | number | null>;
     v(name: string): GraphVar;
     walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{
         [key: string]: any;
