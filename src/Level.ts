@@ -89,7 +89,7 @@ export default class Level<DefaultType = any> {
   }
 
   public async all(): Promise<DefaultType[]> {
-    return this.stream({ all: '', keys: false });
+    return this.stream({ keys: false });
   }
 
   public stream(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
@@ -102,7 +102,8 @@ export default class Level<DefaultType = any> {
       this.DB
         .createReadStream(opts)
         .on('data', (data: any) => {
-          if (opts.values || opts.values === undefined) data.value = JSON.parse(data.value);
+          if (opts.values !== false && opts.keys !== false) data.value = JSON.parse(data.value);
+          if (opts.keys === false) data = JSON.parse(data);
           returnArray.push(data);
         })
         .on('error', reject)
