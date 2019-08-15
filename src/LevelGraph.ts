@@ -1,9 +1,11 @@
 import { isAbsolute, resolve } from 'path';
 
+type InputTypeable = string | number;
+
 interface ITripleBase {
-  subject: string;
-  predicate: string;
-  object: string;
+  subject: InputTypeable;
+  predicate: InputTypeable;
+  object: InputTypeable;
 }
 
 interface ITriple extends ITripleBase {
