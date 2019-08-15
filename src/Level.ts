@@ -95,6 +95,7 @@ export default class Level<DefaultType = any> {
   public stream(opts: Partial<IStreamOptions>, returntype?: 'key' | 'value' | 'both'): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const returnArray: any[] = [];
+      if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
       this.DB
         .createReadStream(opts)
         .on('data', ({ key, value }: { key: string; value: string }) => returnArray.push({ key, value: JSON.parse(value) }))
