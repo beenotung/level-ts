@@ -44,8 +44,20 @@
     "ext": "ts"
   },
   "name": "level-ts",
-  "version": "1.6.0",
+  "version": "1.6.2",
   "description": "The hard typed level module with some extra features",
   "author": "Ryan <ryan@ryanair.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "typescript",
+    "typing",
+    "types",
+    "level",
+    "leveldb",
+    "database",
+    "store",
+    "storage",
+    "json",
+    "key-value"
+  ]
 }
