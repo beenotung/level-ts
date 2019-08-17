@@ -1,0 +1,39 @@
+image: node:10.15.3
+
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - node_modules/
+  - yarn.lock
+
+before_script:
+  - yarn
+  
+stages:
+  - test
+  - publish
+
+test-unit:
+  stage: test
+  script: jest --ci --reporters=default --reporters=jest-junit
+  artifacts:
+    paths:
+      - junit.xml
+    reports:
+      junit: junit.xml
+
+test-coverage:
+  stage: test
+  script: jest --ci --coverage
+  artifacts:
+    paths:
+      - coverage/
+
+publish:
+  stage: publish
+  only:
+    refs:
+      - master
+  script:
+    - yarn publish --non-interactive --no-progress
