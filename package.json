@@ -44,7 +44,7 @@
     "ext": "ts"
   },
   "name": "level-ts",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "The hard typed level module with some extra features",
   "author": "Ryan <ryan@ryanair.com>",
   "license": "MIT",
