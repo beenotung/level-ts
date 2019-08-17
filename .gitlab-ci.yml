@@ -20,7 +20,7 @@ test-unit:
     - docker
     - private
     - sato
-  script: jest --ci --reporters=default --reporters=jest-junit
+  script: yarn jest --ci --reporters=default --reporters=jest-junit
   artifacts:
     paths:
       - junit.xml
@@ -33,7 +33,7 @@ test-coverage:
     - docker
     - private
     - sato
-  script: jest --ci --coverage
+  script: yarn jest --ci --coverage
   artifacts:
     paths:
       - coverage/
