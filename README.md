@@ -16,17 +16,18 @@ const database = new level('./database');
 })();
 ```
 ### Promise forcing
-Callbacks are not supported in this database instance. Instead, promises are used to await the data or actions.
+Callbacks are **not** supported in this database instance. Instead, promises are used to await the data or actions.
 In the normal level package / the old way:
 ```typescript
 db.get('b', (error, data) => {
-  if(error) throw new Error(error);
+  if(error) throw error;
   console.log(data);
 });
 ```
 In this package and forcefully applied:
 ```typescript
 const data = await db.get('b');
+console.log(data);
 ```
 If the `error` argument in the callback is defined, the promise will be rejected with that as it's rejection error.
 
