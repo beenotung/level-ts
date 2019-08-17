@@ -9,6 +9,7 @@ cache:
 
 before_script:
   - yarn
+  - mkdir temp_test.local
   
 stages:
   - test
@@ -16,7 +17,11 @@ stages:
 
 test-unit:
   stage: test
-  script: jest --ci --reporters=default --reporters=jest-junit
+  tags: 
+    - docker
+    - private
+    - sato
+  script: yarn jest --ci --reporters=default --reporters=jest-junit
   artifacts:
     paths:
       - junit.xml
@@ -25,13 +30,21 @@ test-unit:
 
 test-coverage:
   stage: test
-  script: jest --ci --coverage
+  tags: 
+    - docker
+    - private
+    - sato
+  script: yarn jest --ci --coverage
   artifacts:
     paths:
       - coverage/
 
 publish:
   stage: publish
+  tags: 
+    - docker
+    - private
+    - sato
   only:
     refs:
       - master
