@@ -9,6 +9,7 @@ cache:
 
 before_script:
   - yarn
+  - mkdir temp_test.local
   
 stages:
   - test
