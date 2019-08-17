@@ -1,0 +1,54 @@
+image: node:10.15.3
+
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - node_modules/
+  - yarn.lock
+
+before_script:
+  - yarn
+  - mkdir temp_test.local
+  
+stages:
+  - test
+  - publish
+
+test-unit:
+  stage: test
+  tags: 
+    - docker
+    - private
+    - sato
+  script: yarn jest --ci --reporters=default --reporters=jest-junit
+  artifacts:
+    paths:
+      - junit.xml
+    reports:
+      junit: junit.xml
+
+test-coverage:
+  stage: test
+  tags: 
+    - docker
+    - private
+    - sato
+  script: yarn jest --ci --coverage
+  artifacts:
+    paths:
+      - coverage/
+
+publish:
+  stage: publish
+  tags: 
+    - docker
+    - private
+    - sato
+  only:
+    refs:
+      - master
+  script:
+    - echo "email $NPM_EMAIL" > .yarnrc
+    - echo "username $NPM_USERNAME" >> .yarnrc
+    - echo "$NPM_PASSWORD" | yarn publish --non-interactive --no-progress --use-yarnrc ./yarnrc --minor

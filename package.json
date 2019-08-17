@@ -12,6 +12,7 @@
     "@types/node": "^11.13.7",
     "commitizen": "^3.1.1",
     "cz-emoji": "^1.1.2",
+    "jest-junit": "^7.0.0",
     "nodemon": "^1.19.1",
     "ts-node": "^8.3.0",
     "tslint": "^5.16.0",
@@ -22,6 +23,7 @@
     "start:watch": "nodemon",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
+    "prepublishOnly": "yarn build",
     "deploy": "git checkout master && git merge development -X theirs -m \":twisted_rightwards_arrows: Merge with Development\" && yarn build && git add . && git add -f dist && git commit -m \":rocket: Building for Deployment\" || true && git push && git checkout development"
   },
   "config": {
@@ -41,10 +43,9 @@
     "exec": "yarn start",
     "ext": "ts"
   },
-  "name": "level",
-  "version": "1.1.0",
-  "description": "The hard typed level module",
-  "repository": "git@git.volta.im:Ryan/level.git",
+  "name": "level-ts",
+  "version": "1.4.0",
+  "description": "The hard typed level module with some extra features",
   "author": "Ryan <ryan@ryanair.com>",
   "license": "MIT"
 }
