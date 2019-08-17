@@ -49,6 +49,8 @@ publish:
     refs:
       - master
   script:
+    - git config user.email "$NPM_EMAIL"
+    - git config user.name "$NPM_USERNAME"
     - echo "email $NPM_EMAIL" > .yarnrc
     - echo "username $NPM_USERNAME" >> .yarnrc
     - yarn publish --non-interactive --no-progress --use-yarnrc ./.yarnrc --minor
