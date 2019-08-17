@@ -49,4 +49,6 @@ publish:
     refs:
       - master
   script:
-    - yarn publish --non-interactive --minor --no-progress
+    - echo "email $NPM_EMAIL" > .yarnrc
+    - echo "username $NPM_USERNAME" >> .yarnrc
+    - yarn publish --non-interactive --no-progress --use-yarnrc ./.yarnrc --minor
