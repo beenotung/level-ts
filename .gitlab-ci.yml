@@ -51,4 +51,4 @@ publish:
   script:
     - echo "email $NPM_EMAIL" > .yarnrc
     - echo "username $NPM_USERNAME" >> .yarnrc
-    - echo "$NPM_PASSWORD" | yarn publish --non-interactive --no-progress --use-yarnrc ./.yarnrc --minor
+    - echo "$NPM_PASSWORD" | yarn publish --use-yarnrc ./.yarnrc --minor
