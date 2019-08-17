@@ -16,6 +16,7 @@ stages:
 
 test-unit:
   stage: test
+  tags: sato
   script: jest --ci --reporters=default --reporters=jest-junit
   artifacts:
     paths:
@@ -25,6 +26,7 @@ test-unit:
 
 test-coverage:
   stage: test
+  tags: sato
   script: jest --ci --coverage
   artifacts:
     paths:
@@ -32,6 +34,7 @@ test-coverage:
 
 publish:
   stage: publish
+  tags: sato
   only:
     refs:
       - master
