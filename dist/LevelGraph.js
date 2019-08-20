@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable: jsdoc-format
 const path_1 = require("path");
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires one-variable-per-declaration

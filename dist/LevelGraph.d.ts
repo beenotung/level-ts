@@ -1,16 +1,38 @@
-declare type InputTypeable = string | number;
+declare type TripleInp = string | number;
 interface ITripleBase {
-    subject: InputTypeable;
-    predicate: InputTypeable;
-    object: InputTypeable;
+    subject: TripleInp;
+    predicate: TripleInp;
+    object: TripleInp;
 }
-interface ITriple extends ITripleBase {
+interface ITriple<Predicates extends TripleInp> extends ITripleBase {
+    predicate: Predicates;
     [key: string]: any;
 }
-interface IGetTriple extends Partial<ITriple> {
+interface IGetTriple<Predicates extends TripleInp> extends Partial<ITriple<Predicates>> {
     limit?: number;
     offset?: number;
     reverse?: boolean;
+}
+interface IChainObject<Predicates extends TripleInp> {
+    put(triple: ITriple<Predicates>): IChainObject<Predicates>;
+    del(triple: ITriple<Predicates>): IChainObject<Predicates>;
+    get(triple: IGetTriple<Predicates>): IChainObject<Predicates>;
+    finish(): Promise<Array<IGetTriple<Predicates>>>;
+}
+export declare class LevelGraph<StaticPredicates extends TripleInp = string | number> {
+    static rootFolder: string;
+    static setRoot(path: string): void;
+    private DB;
+    constructor(path: string);
+    readonly chain: IChainObject<StaticPredicates>;
+    put(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void>;
+    del(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void>;
+    get(triple: IGetTriple<StaticPredicates>): Promise<Array<ITriple<StaticPredicates>>>;
+    find(subject: string | null, predicate: StaticPredicates | null, object?: string | null): Promise<string | number | StaticPredicates | null>;
+    v(name: string): GraphVar;
+    walk(options: IWalkOptions, ...path: Array<IWalkPath<StaticPredicates>>): Promise<Array<{
+        [key: string]: any;
+    }>>;
 }
 declare type GraphVar = any;
 interface IWalkOptions {
@@ -23,32 +45,11 @@ interface IWalkOptions {
     };
     filter?: (solution: any, callback: (error: string | null, solution?: any) => void) => void;
 }
-interface IWalkPath {
+interface IWalkPath<Predicates extends TripleInp> {
     subject: string | GraphVar;
     predicate: string | GraphVar;
     object: string | GraphVar;
-    filter?: (this: any, triple: ITriple) => boolean;
-}
-interface IChainObject {
-    put(triple: ITriple): IChainObject;
-    del(triple: ITriple): IChainObject;
-    get(triple: IGetTriple): IChainObject;
-    finish(): Promise<IGetTriple[]>;
-}
-export declare class LevelGraph {
-    static rootFolder: string;
-    static setRoot(path: string): void;
-    private DB;
-    constructor(path: string);
-    readonly chain: IChainObject;
-    put(triple: ITriple | ITriple[]): Promise<void>;
-    del(triple: ITriple | ITriple[]): Promise<void>;
-    get(triple: IGetTriple): Promise<ITriple[]>;
-    find(subject: string | null, predicate: string | null, object?: string | null): Promise<string | number | null>;
-    v(name: string): GraphVar;
-    walk(options: IWalkOptions, ...path: IWalkPath[]): Promise<Array<{
-        [key: string]: any;
-    }>>;
+    filter?: (this: any, triple: ITriple<Predicates>) => boolean;
 }
 export {};
 //# sourceMappingURL=LevelGraph.d.ts.map
