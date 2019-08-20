@@ -51,6 +51,9 @@
   "name": "level-ts",
   "description": "The hard typed level module with some extra features",
   "author": "Ryan <ryan@ryanair.com>",
+  "repository": {
+    "url": "https://gitlab.com/NotRyan_/level-ts"
+  },
   "license": "MIT",
   "keywords": [
     "typescript",
