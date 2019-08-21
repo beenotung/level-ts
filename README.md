@@ -100,12 +100,14 @@ await db.chain
   .put('session-foo-1', { ... })
   .put('session-foo-2', { ... })
   .put('session-foo-3', { ... })
+  .finish();
 
 const sessions = await db.stream({ all: 'session-ryan-' }) 
 // The all option is the same as: { gte: 'session-ryan-', lte: 'session-ryan-\xff' }
 // Returns everything starting with 'session-ryan-'
 for(const { key, value } of sessions) {
-  console.log(key,'=', value.toString()); // "session-ryan-[1-3]=[Object object]"
+  console.log(key,'=', value.toString()); // Returns all sessions from ryan
+  // (Entries with prefixed key "session-ryan-")
 }
 ```
 
