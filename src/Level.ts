@@ -8,11 +8,11 @@ const instances: {
   [fullpath: string]: any;
 } = {};
 
-interface IChainObject<InputType> {
-  del(key: string): IChainObject<InputType>;
-  get(key: string): IChainObject<InputType>;
-  put(key: string, value: InputType): IChainObject<InputType>;
-  finish(): Promise<InputType[]>;
+interface IChainObject<DefaultType> {
+  del(key: string): IChainObject<DefaultType>;
+  get(key: string): IChainObject<DefaultType>;
+  put<EntryType = DefaultType>(key: string, value: EntryType): IChainObject<EntryType>;
+  finish(): Promise<DefaultType[]>;
 }
 
 export default class Level<DefaultType = any> {
@@ -39,13 +39,13 @@ export default class Level<DefaultType = any> {
     }
   }
 
-  public async find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined> {
+  public async find<EntryType = DefaultType>(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined> {
     const all = await this.all();
     return all.find(func as any);
   }
 
-  public async filter(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined) {
-    const all = await this.all();
+  public async filter<EntryType = DefaultType>(func: (value: EntryType, ind: number, all: EntryType[]) => boolean | null | undefined) {
+    const all = await this.all<EntryType>();
     return all.filter(func);
   }
 
@@ -64,16 +64,16 @@ export default class Level<DefaultType = any> {
     return {
       get(key: string) { promises.push(instance.get(key)); return this; },
       del(key: string) { promises.push(instance.del(key)); return this; },
-      put(key: string, value: DefaultType) { promises.push(instance.put(key, value)); return this; },
+      put(key: string, value: any) { promises.push(instance.put(key, value)); return this as any; },
       async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
     };
   }
 
-  public async get(key: string): Promise<DefaultType> {
+  public async get<EntryType = DefaultType>(key: string): Promise<EntryType> {
     return JSON.parse(await this.DB.get(key));
   }
 
-  public async put(key: string, value: DefaultType): Promise<DefaultType> {
+  public async put<EntryType = DefaultType>(key: string, value: EntryType): Promise<EntryType> {
     await this.DB.put(key, JSON.stringify(value));
     return value;
   }
@@ -82,21 +82,21 @@ export default class Level<DefaultType = any> {
     await this.DB.del(key);
   }
 
-  public async merge(key: string, config: Partial<DefaultType>): Promise<DefaultType> {
-    const newConfig = Object.assign(await this.get(key), config);
-    await this.put(key, newConfig);
+  public async merge<EntryType = DefaultType>(key: string, config: Partial<EntryType>): Promise<EntryType> {
+    const newConfig = Object.assign(await this.get<EntryType>(key), config);
+    await this.put<EntryType>(key, newConfig);
     return newConfig;
   }
 
-  public async all(): Promise<DefaultType[]> {
-    return this.stream({ keys: false });
+  public async all<EntryType = DefaultType>(): Promise<EntryType[]> {
+    return this.stream<EntryType>({ keys: false });
   }
 
-  public stream(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
-  public stream(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<DefaultType[]>;
-  public stream(opts: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: DefaultType }>>;
-  public stream(opts: Partial<IStreamOptions>): Promise<any[]> {
-    return new Promise((resolve, reject) => {
+  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
+  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<EntryType[]>;
+  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: EntryType }>>;
+  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions>): Promise<any[]> {
+    return new Promise((resolver, reject) => {
       const returnArray: any[] = [];
       if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
       this.DB
@@ -107,7 +107,7 @@ export default class Level<DefaultType = any> {
           returnArray.push(data);
         })
         .on('error', reject)
-        .on('end', () => resolve(returnArray));
+        .on('end', () => resolver(returnArray));
     });
   }
 }
