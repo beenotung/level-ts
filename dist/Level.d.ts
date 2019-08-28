@@ -1,8 +1,8 @@
-interface IChainObject<InputType> {
-    del(key: string): IChainObject<InputType>;
-    get(key: string): IChainObject<InputType>;
-    put(key: string, value: InputType): IChainObject<InputType>;
-    finish(): Promise<InputType[]>;
+interface IChainObject<DefaultType> {
+    del(key: string): IChainObject<DefaultType>;
+    get(key: string): IChainObject<DefaultType>;
+    put<EntryType = DefaultType>(key: string, value: EntryType): IChainObject<EntryType>;
+    finish(): Promise<DefaultType[]>;
 }
 export default class Level<DefaultType = any> {
     static rootFolder: string;
@@ -10,29 +10,29 @@ export default class Level<DefaultType = any> {
     private DB;
     constructor(database: object);
     constructor(path: string);
-    find(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
-    filter(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType[]>;
+    find<EntryType = DefaultType>(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
+    filter<EntryType = DefaultType>(func: (value: EntryType, ind: number, all: EntryType[]) => boolean | null | undefined): Promise<EntryType[]>;
     exists(key: string): Promise<boolean>;
     readonly chain: IChainObject<DefaultType>;
-    get(key: string): Promise<DefaultType>;
-    put(key: string, value: DefaultType): Promise<DefaultType>;
+    get<EntryType = DefaultType>(key: string): Promise<EntryType>;
+    put<EntryType = DefaultType>(key: string, value: EntryType): Promise<EntryType>;
     del(key: string): Promise<void>;
-    merge(key: string, config: Partial<DefaultType>): Promise<DefaultType>;
-    all(): Promise<DefaultType[]>;
-    stream(opts: Partial<IStreamOptions> & {
+    merge<EntryType = DefaultType>(key: string, config: Partial<EntryType>): Promise<EntryType>;
+    all<EntryType = DefaultType>(): Promise<EntryType[]>;
+    stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
         keys?: true;
         values: false;
     }): Promise<string[]>;
-    stream(opts: Partial<IStreamOptions> & {
+    stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
         keys: false;
         values?: true;
-    }): Promise<DefaultType[]>;
-    stream(opts: Partial<IStreamOptions> & {
+    }): Promise<EntryType[]>;
+    stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
         keys?: true;
         values?: true;
     }): Promise<Array<{
         key: string;
-        value: DefaultType;
+        value: EntryType;
     }>>;
 }
 interface IStreamOptions {

@@ -68,7 +68,7 @@ class Level {
         return this.stream({ keys: false });
     }
     stream(opts) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolver, reject) => {
             const returnArray = [];
             if (opts.all)
                 Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
@@ -82,7 +82,7 @@ class Level {
                 returnArray.push(data);
             })
                 .on('error', reject)
-                .on('end', () => resolve(returnArray));
+                .on('end', () => resolver(returnArray));
         });
     }
 }
