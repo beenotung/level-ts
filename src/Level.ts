@@ -73,7 +73,7 @@ export default class Level<DefaultType = any> {
     return JSON.parse(await this.DB.get(key));
   }
 
-  public async put<EntryType = DefaultType>(key: string, value: EntryType): Promise<EntryType> {
+  public async put<EntryType = DefaultType>(key: string, value: Required<EntryType>): Promise<EntryType> {
     await this.DB.put(key, JSON.stringify(value));
     return value;
   }
@@ -83,7 +83,8 @@ export default class Level<DefaultType = any> {
   }
 
   public async merge<EntryType = DefaultType>(key: string, config: Partial<EntryType>): Promise<EntryType> {
-    const newConfig = Object.assign(await this.get<EntryType>(key), config);
+    const oldConfig = await this.get<EntryType>(key);
+    const newConfig = { ...oldConfig, ...config } as any;
     await this.put<EntryType>(key, newConfig);
     return newConfig;
   }
