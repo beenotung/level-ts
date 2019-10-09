@@ -61,8 +61,11 @@ export class LevelGraph<StaticPredicates extends TripleInp = string | number> {
     };
   }
 
-  public put(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void> {
+  public put(subject: string | number, predicate: StaticPredicates, object: string): Promise<void>;
+  public put(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void>;
+  public put(triple: string | number | ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>, predicate?: StaticPredicates, object?: string): Promise<void> {
     return new Promise((res, rej) => {
+      if (!!predicate && !!object && (typeof triple === 'string' || typeof triple === 'number')) triple = { subject: triple, predicate, object };
       if (Array.isArray(triple)) Promise.all(triple.map((t) => this.put(t))).catch((e) => rej(e)).then(() => res());
       else this.DB.put(triple, (err: any) => err ? rej(err) : res());
     });
