@@ -27,8 +27,10 @@ class LevelGraph {
             async finish() { return (await Promise.all(promises)).filter((v) => !!v); },
         };
     }
-    put(triple) {
+    put(triple, predicate, object) {
         return new Promise((res, rej) => {
+            if (!!predicate && !!object && (typeof triple === 'string' || typeof triple === 'number'))
+                triple = { subject: triple, predicate, object };
             if (Array.isArray(triple))
                 Promise.all(triple.map((t) => this.put(t))).catch((e) => rej(e)).then(() => res());
             else

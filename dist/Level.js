@@ -60,7 +60,8 @@ class Level {
         await this.DB.del(key);
     }
     async merge(key, config) {
-        const newConfig = Object.assign(await this.get(key), config);
+        const oldConfig = await this.get(key);
+        const newConfig = { ...oldConfig, ...config };
         await this.put(key, newConfig);
         return newConfig;
     }

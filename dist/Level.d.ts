@@ -15,7 +15,7 @@ export default class Level<DefaultType = any> {
     exists(key: string): Promise<boolean>;
     readonly chain: IChainObject<DefaultType>;
     get<EntryType = DefaultType>(key: string): Promise<EntryType>;
-    put<EntryType = DefaultType>(key: string, value: EntryType): Promise<EntryType>;
+    put<EntryType = DefaultType>(key: string, value: Required<EntryType>): Promise<EntryType>;
     del(key: string): Promise<void>;
     merge<EntryType = DefaultType>(key: string, config: Partial<EntryType>): Promise<EntryType>;
     all<EntryType = DefaultType>(): Promise<EntryType[]>;
