@@ -39,21 +39,21 @@ test('Chaining a dataset with chaining', () => {
   ).resolves.toBeDefined();
 });
 
-test('Streaming dataset', async () => {
+test('Streaming all dataset', async () => {
+return   expect(db.stream()).resolves.toHaveLength(5);
+});
+
+test('Streaming range of dataset', async () => {
   const keys = ['Data2', 'Data3', 'Data4'];
   const dataset = await db.stream({
     gte: 'Data2',
     lte: 'Data4',
   });
-  expect(dataset).toHaveLength(3);
+  expect(dataset).toHaveLength(keys.length);
   for (const data of dataset) {
     expect(keys.includes(data.key)).toBeTruthy();
     expect(data.value).toMatchObject({ test: 'jest' });
   }
-});
-
-test('Reading all dataset', async () => {
-  return expect(db.all()).resolves.toHaveLength(5);
 });
 
 test('Iterate all dataset', async () => {
@@ -61,6 +61,24 @@ test('Iterate all dataset', async () => {
   const stream = db.iterate();
   stream.onData((data) => dataset.push(data));
   return expect(stream.wait().then(() => dataset)).resolves.toHaveLength(5);
+});
+
+test('Iterate range of dataset', async () => {
+  const keys = ['Data2', 'Data3', 'Data4'];
+  const dataset: any[] = [];
+  const stream = db.iterate({
+    gte: 'Data2',
+    lte: 'Data4',
+  });
+  stream.onData((data) => {
+    expect(keys.includes(data.key)).toBeTruthy();
+    dataset.push(data);
+  });
+  return expect(stream.wait().then(() => dataset)).resolves.toHaveLength(keys.length);
+});
+
+test('Reading all dataset', async () => {
+  return expect(db.all()).resolves.toHaveLength(5);
 });
 
 test('Using an already created db inside constructor', async () => {
