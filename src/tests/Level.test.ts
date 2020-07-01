@@ -3,7 +3,7 @@ import { rmdirSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 
 interface IObj {
-  test: 'jest';
+  test: string;
 }
 
 Level.setRoot('temp_test.local');
@@ -30,11 +30,11 @@ test('Deleting data - .del( test )', () => {
 test('Chaining a dataset with chaining', () => {
   return expect(
     db.chain
-      .put('Data1', { test: 'jest' })
-      .put('Data2', { test: 'jest' })
-      .put('Data3', { test: 'jest' })
-      .put('Data4', { test: 'jest' })
-      .put('Data5', { test: 'jest' })
+      .put('Data1', { test: 'jest-1' })
+      .put('Data2', { test: 'jest-2' })
+      .put('Data3', { test: 'jest-3' })
+      .put('Data4', { test: 'jest-4' })
+      .put('Data5', { test: 'jest-5' })
       .finish()
   ).resolves.toBeDefined();
 });
@@ -52,7 +52,7 @@ test('Streaming range of dataset', async () => {
   expect(dataset).toHaveLength(keys.length);
   for (const data of dataset) {
     expect(keys.includes(data.key)).toBeTruthy();
-    expect(data.value).toMatchObject({ test: 'jest' });
+    expect(data.value).toMatchObject({ test: 'jest-' + data.key.replace('Data', '') });
   }
 });
 
@@ -79,6 +79,14 @@ test('Iterate range of dataset', async () => {
 
 test('Reading all dataset', async () => {
   return expect(db.all()).resolves.toHaveLength(5);
+});
+
+test('Find data', async () => {
+  return expect(db.find((value) => value.test.split('-')[1] >= '2')).resolves.toStrictEqual({test: 'jest-2'});
+});
+
+test('Filter dataset', async () => {
+  return expect(db.filter((value) => value.test.split('-')[1] >= '2')).resolves.toHaveLength(4);
 });
 
 test('Using an already created db inside constructor', async () => {
