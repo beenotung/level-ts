@@ -49,11 +49,14 @@
     "exec": "yarn start",
     "ext": "ts"
   },
-  "name": "level-ts",
+  "name": "@beenotung/level-ts",
   "description": "The hard typed level module with some extra features",
   "author": "Ryan <ryan@devdroplets.ga>",
+  "contributors": [
+    "Beeno Tung <aabbcc1241@yahoo.com.hk>"
+  ],
   "repository": {
-    "url": "https://gitlab.com/NotRyan_/level-ts"
+    "url": "https://github.com/beenotung/level-ts"
   },
   "license": "MIT",
   "keywords": [
