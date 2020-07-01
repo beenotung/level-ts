@@ -24,7 +24,7 @@ export declare class LevelGraph<StaticPredicates extends TripleInp = string | nu
     static setRoot(path: string): void;
     private DB;
     constructor(path: string);
-    readonly chain: IChainObject<StaticPredicates>;
+    get chain(): IChainObject<StaticPredicates>;
     put(subject: string | number, predicate: StaticPredicates, object: string): Promise<void>;
     put(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void>;
     del(triple: ITriple<StaticPredicates> | Array<ITriple<StaticPredicates>>): Promise<void>;

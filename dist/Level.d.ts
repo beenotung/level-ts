@@ -10,10 +10,10 @@ export default class Level<DefaultType = any> {
     private DB;
     constructor(database: object);
     constructor(path: string);
-    find<EntryType = DefaultType>(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined>;
-    filter<EntryType = DefaultType>(func: (value: EntryType, ind: number, all: EntryType[]) => boolean | null | undefined): Promise<EntryType[]>;
+    find<EntryType = DefaultType>(func: (value: DefaultType, key: string) => boolean | null | undefined): Promise<EntryType | undefined>;
+    filter<EntryType = DefaultType>(func: (value: DefaultType, key: string) => boolean | null | undefined): Promise<EntryType[]>;
     exists(key: string): Promise<boolean>;
-    readonly chain: IChainObject<DefaultType>;
+    get chain(): IChainObject<DefaultType>;
     get<EntryType = DefaultType>(key: string): Promise<EntryType>;
     put<EntryType = DefaultType>(key: string, value: Required<EntryType>): Promise<EntryType>;
     del(key: string): Promise<void>;
@@ -27,13 +27,28 @@ export default class Level<DefaultType = any> {
         keys: false;
         values?: true;
     }): Promise<EntryType[]>;
-    stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+    stream<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & {
         keys?: true;
         values?: true;
     }): Promise<Array<{
         key: string;
         value: EntryType;
     }>>;
+    iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+    }): IStream<string>;
+    iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+    }): IStream<EntryType>;
+    iterate<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+    }): IStream<{
+        key: string;
+        value: EntryType;
+    }>;
 }
 interface IStreamOptions {
     /**define the lower bound of the range to be streamed. Only entries where the key is greater than (or equal to) this option will be included in the range. When reverse=true the order will be reversed, but the entries streamed will be the same. */
@@ -52,6 +67,12 @@ interface IStreamOptions {
     keys: boolean;
     /**(default: true) whether the results should contain values. If set to true and keys set to false then results will simply be values, rather than objects with a value property. Used internally by the createValueStream() method. */
     values: boolean;
+}
+declare type TerminateReason = 'end' | 'cancel';
+interface IStream<T> {
+    close(): void;
+    onData(cb: (data: T) => void): void;
+    wait(): Promise<TerminateReason>;
 }
 export {};
 //# sourceMappingURL=Level.d.ts.map

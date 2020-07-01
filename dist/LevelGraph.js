@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LevelGraph = void 0;
 // tslint:disable: jsdoc-format
 const path_1 = require("path");
 // tslint:disable: jsdoc-format
@@ -82,6 +83,6 @@ class LevelGraph {
         });
     }
 }
-LevelGraph.rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
 exports.LevelGraph = LevelGraph;
+LevelGraph.rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
 //# sourceMappingURL=LevelGraph.js.map
