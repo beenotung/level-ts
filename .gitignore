@@ -5,8 +5,12 @@ node_modules
 *.log
 yarn.lock
 package-*
+pnpm-lock.yaml
 
 # Local files
 # dist
 *.local
 .yarnrc
+
+# IDE files
+.idea/
