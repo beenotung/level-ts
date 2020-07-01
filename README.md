@@ -4,7 +4,7 @@ This can replace your current level database instance exactly, but with typescri
 
 
 ```typescript
-import level from 'level-ts';
+import level from '@beenotung/level-ts';
 
 const database = new level('./database');
 
@@ -46,7 +46,7 @@ await samedb.get('first'); // { value: 1 }
 It is also possible to use an already initialized database instance inside the level constructor. As long as it has the appropriate functions. E.g:
 ```typescript
 import Level from 'level';
-import LevelTypescript from 'level-ts';
+import LevelTypescript from '@beenotung/level-ts';
 
 const instance = Level('./database'); // You can use other packages too.
 
@@ -61,7 +61,7 @@ This allows for some more customization and useability.
 #### Typescript support
 
 ```typescript
-import level from 'level-ts';
+import level from '@beenotung/level-ts';
 
 interface IEntry { //
   foo: string;
@@ -164,7 +164,7 @@ const data = await db.find((value, key) => { return value.user === 'Ryan'}); // 
 # Levelgraph
 Level graph database is also implemented inside this package like this:
 ```typescript
-import { LevelGraph } from 'level-ts';
+import { LevelGraph } from '@beenotung/level-ts';
 const graphdb = new LevelGraph('./graph-database');
 
 await graphdb.put({ subject: 'Ryan', predicate: 'owns-a', object: 'foo' });
