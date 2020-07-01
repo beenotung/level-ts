@@ -54,6 +54,13 @@ test('Reading all dataset', async () => {
   return expect(db.all()).resolves.toHaveLength(5);
 });
 
+test('Iterate all dataset', async () => {
+  const dataset: any[] = [];
+  const stream = db.iterate();
+  stream.onData((data) => dataset.push(data));
+  return expect(stream.wait().then(() => dataset)).resolves.toHaveLength(5);
+});
+
 test('Using an already created db inside constructor', async () => {
   const database = require('level')(resolve('temp_test.local', 'level-db-2'));
   const instance = new Level(database);

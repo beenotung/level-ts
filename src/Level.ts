@@ -111,6 +111,42 @@ export default class Level<DefaultType = any> {
         .on('end', () => resolver(returnArray));
     });
   }
+  public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values: false }): IStream<string>;
+  public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false, values?: true }): IStream<EntryType>;
+  public iterate<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true, values?: true }): IStream<{ key: string, value: EntryType }>;
+  public iterate<EntryType = DefaultType>(optionalOpts?: Partial<IStreamOptions> & { keys?: boolean, values?: boolean }): IStream<any> {
+        const opts = optionalOpts || {};
+        if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
+        let resolveEnd!: () => void;
+        let rejectEnd!: (error?: any) => void;
+        const endPromise = new Promise<void>((resolver, reject) => {
+            resolveEnd = resolver;
+            rejectEnd = reject;
+          });
+        const dataCbs: Array<(data: any) => void> = [];
+        const stream: IStream<any> = {
+                  onData(cb: (data: any) => void) {
+                  dataCbs.push(cb);
+                },
+                  wait(): Promise<void> {
+                return endPromise;
+              },
+            };
+        this.DB
+            .createReadStream(opts)
+            .on('data', (data: any) => {
+                if (opts.values !== false && opts.keys !== false) {
+                    data.value = JSON.parse(data.value);
+                  }
+                if (opts.keys === false) {
+                    data = JSON.parse(data);
+                  }
+                dataCbs.forEach((cb) => cb(data));
+              })
+            .on('error', rejectEnd)
+            .on('end', resolveEnd);
+        return stream;
+      }
 }
 
 interface IStreamOptions {
@@ -133,4 +169,10 @@ interface IStreamOptions {
   keys: boolean;
   /**(default: true) whether the results should contain values. If set to true and keys set to false then results will simply be values, rather than objects with a value property. Used internally by the createValueStream() method. */
   values: boolean;
+}
+
+interface IStream<T> {
+  onData(cb: (data: T) => void): void;
+
+  wait(): Promise<void>; // resolve when ended
 }
