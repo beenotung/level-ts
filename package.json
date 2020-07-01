@@ -29,8 +29,8 @@
     "start:watch": "nodemon",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "prepublishOnly": "yarn build",
-    "deploy": "git checkout master && git merge development -X theirs -m \":twisted_rightwards_arrows: Merge with Development\" && yarn build && git add . && git add -f dist && git commit -m \":rocket: Building for Deployment\" || true && git push && git checkout development"
+    "prepublishOnly": "npm run build",
+    "deploy": "git checkout master && git merge development -X theirs -m \":twisted_rightwards_arrows: Merge with Development\" && npm run build && git add . && git add -f dist && git commit -m \":rocket: Building for Deployment\" || true && git push && git checkout development"
   },
   "config": {
     "commitizen": {
@@ -46,7 +46,7 @@
     "watch": [
       "src"
     ],
-    "exec": "yarn start",
+    "exec": "npm start",
     "ext": "ts"
   },
   "name": "@beenotung/level-ts",
