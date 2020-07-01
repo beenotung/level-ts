@@ -95,12 +95,13 @@ export default class Level<DefaultType = any> {
 
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<EntryType[]>;
-  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: EntryType }>>;
-  public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions>): Promise<any[]> {
+  public stream<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: EntryType }>>;
+  public stream<EntryType = DefaultType>(optionalOpts?: Partial<IStreamOptions>): Promise<any[]> {
     return new Promise((resolver, reject) => {
-      const returnArray: any[] = [];
-      if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
-      this.DB
+        const opts = optionalOpts || {};
+        const returnArray: any[] = [];
+        if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
+        this.DB
         .createReadStream(opts)
         .on('data', (data: any) => {
           if (opts.values !== false && opts.keys !== false) data.value = JSON.parse(data.value);
