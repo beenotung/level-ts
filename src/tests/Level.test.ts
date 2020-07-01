@@ -86,7 +86,12 @@ test('Find data', async () => {
 });
 
 test('Filter dataset', async () => {
-  return expect(db.filter((value) => value.test.split('-')[1] >= '2')).resolves.toHaveLength(4);
+  const keys = ['Data2', 'Data3', 'Data4', 'Data5'];
+  const results = await db.filter((value) => value.test.split('-')[1] >= '2');
+  expect(results).toHaveLength(keys.length);
+  for (const key of keys) {
+    expect(results.some((data) => data.test === 'jest-' + key.replace('Data', '')));
+  }
 });
 
 test('Using an already created db inside constructor', async () => {

@@ -39,14 +39,34 @@ export default class Level<DefaultType = any> {
     }
   }
 
-  public async find<EntryType = DefaultType>(func: (value: DefaultType, ind: number, all: DefaultType[]) => boolean | null | undefined): Promise<DefaultType | undefined> {
-    const all = await this.all();
-    return all.find(func as any);
+  public async find<EntryType = DefaultType>(func: (value: DefaultType, key: string) => boolean | null | undefined): Promise<EntryType | undefined> {
+    return new Promise<EntryType | undefined>((resolver, reject) => {
+      const stream = this.iterate();
+      stream.onData((data) => {
+        if (func(data.value, data.key)) {
+          resolver(data.value as DefaultType as any as EntryType);
+          stream.close();
+        }
+      });
+      stream.wait()
+        .then(() => resolver(undefined))
+        .catch(reject);
+    });
   }
 
-  public async filter<EntryType = DefaultType>(func: (value: EntryType, ind: number, all: EntryType[]) => boolean | null | undefined) {
-    const all = await this.all<EntryType>();
-    return all.filter(func);
+  public async filter<EntryType = DefaultType>(func: (value: DefaultType, key: string) => boolean | null | undefined): Promise<EntryType[]> {
+    return new Promise<EntryType[]>((resolver, reject) => {
+      const matches: EntryType[] = [];
+      const stream = this.iterate();
+      stream.onData((data) => {
+        if (func(data.value, data.key)) {
+          matches.push(data.value as DefaultType as any as EntryType);
+        }
+      });
+      stream.wait()
+        .then(() => resolver(matches))
+        .catch(reject);
+    });
   }
 
   public exists(key: string): Promise<boolean> {
@@ -96,58 +116,53 @@ export default class Level<DefaultType = any> {
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<EntryType[]>;
   public stream<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: EntryType }>>;
-  public stream<EntryType = DefaultType>(optionalOpts?: Partial<IStreamOptions>): Promise<any[]> {
-    return new Promise((resolver, reject) => {
-        const opts = optionalOpts || {};
-        const returnArray: any[] = [];
-        if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
-        this.DB
-        .createReadStream(opts)
-        .on('data', (data: any) => {
-          if (opts.values !== false && opts.keys !== false) data.value = JSON.parse(data.value);
-          if (opts.keys === false) data = JSON.parse(data);
-          returnArray.push(data);
-        })
-        .on('error', reject)
-        .on('end', () => resolver(returnArray));
-    });
+  public stream<EntryType = DefaultType>(opts?: Partial<IStreamOptions>): Promise<any[]> {
+    const returnArray: any[] = [];
+    const stream = this.iterate(opts as any);
+    stream.onData((data) => returnArray.push(data));
+    return stream.wait().then(() => returnArray);
   }
+
   public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values: false }): IStream<string>;
   public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false, values?: true }): IStream<EntryType>;
   public iterate<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true, values?: true }): IStream<{ key: string, value: EntryType }>;
-  public iterate<EntryType = DefaultType>(optionalOpts?: Partial<IStreamOptions> & { keys?: boolean, values?: boolean }): IStream<any> {
-        const opts = optionalOpts || {};
-        if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
-        let resolveEnd!: () => void;
-        let rejectEnd!: (error?: any) => void;
-        const endPromise = new Promise<void>((resolver, reject) => {
-            resolveEnd = resolver;
-            rejectEnd = reject;
-          });
-        const dataCbs: Array<(data: any) => void> = [];
-        const stream: IStream<any> = {
-                  onData(cb: (data: any) => void) {
-                  dataCbs.push(cb);
-                },
-                  wait(): Promise<void> {
-                return endPromise;
-              },
-            };
-        this.DB
-            .createReadStream(opts)
-            .on('data', (data: any) => {
-                if (opts.values !== false && opts.keys !== false) {
-                    data.value = JSON.parse(data.value);
-                  }
-                if (opts.keys === false) {
-                    data = JSON.parse(data);
-                  }
-                dataCbs.forEach((cb) => cb(data));
-              })
-            .on('error', rejectEnd)
-            .on('end', resolveEnd);
-        return stream;
-      }
+  public iterate<EntryType = DefaultType>(optionalOpts?: Partial<IStreamOptions>): IStream<any> {
+    const opts = optionalOpts || {};
+    if (opts.all) Object.assign(opts, { gte: opts.all, lte: opts.all + '\xff' });
+    let resolveEnd!: (reason: TerminateReason) => void;
+    let rejectEnd!: (error?: any) => void;
+    const endPromise = new Promise<TerminateReason>((resolver, reject) => {
+      resolveEnd = resolver;
+      rejectEnd = reject;
+    });
+    const dataCbs: Array<(data: any) => void> = [];
+    const readStream = this.DB
+      .createReadStream(opts)
+      .on('data', (data: any) => {
+        if (opts.values !== false && opts.keys !== false) {
+          data.value = JSON.parse(data.value);
+        }
+        if (opts.keys === false) {
+          data = JSON.parse(data);
+        }
+        dataCbs.forEach((cb) => cb(data));
+      })
+      .on('error', rejectEnd)
+      .on('end', () => resolveEnd('end'));
+    const stream: IStream<any> = {
+      onData(cb: (data: any) => void) {
+        dataCbs.push(cb);
+      },
+      close() {
+        readStream.destroy();
+        resolveEnd('cancel');
+      },
+      wait(): Promise<TerminateReason> {
+        return endPromise;
+      },
+    };
+    return stream;
+  }
 }
 
 interface IStreamOptions {
@@ -172,8 +187,10 @@ interface IStreamOptions {
   values: boolean;
 }
 
-interface IStream<T> {
-  onData(cb: (data: T) => void): void;
+type TerminateReason= 'end' | 'cancel';
 
-  wait(): Promise<void>; // resolve when ended
+interface IStream<T> {
+  close(): void; // early terminate the iteration
+  onData(cb: (data: T) => void): void;
+  wait(): Promise<TerminateReason>; // resolve when ended, with reason
 }

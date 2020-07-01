@@ -159,7 +159,7 @@ const data = await db.filter((v, i, a) => { return !!v.isCool }); // Returns all
 ##### Find
 Works exactly as `Array.find( ... )` but with the database values as array.
 ```typescript
-const data = await db.find((v, i, a) => { return v.user === 'Ryan'}); // Finds the first object that has user value 'Ryan'
+const data = await db.find((value, key) => { return value.user === 'Ryan'}); // Finds the first object that has user value 'Ryan'
 ```
 # Levelgraph
 Level graph database is also implemented inside this package like this:
