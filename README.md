@@ -92,6 +92,8 @@ console.log(data); // [{ value: 2 }, { value: 1 }]
 
 ### Streaming
 You can also "stream" data with promises. This works different than the *stream* of Node.js. It does use the same mechanic, but wraps it neatly inside a promise with typescript value return support.
+
+#### Writing in Stream
 ```typescript
 await db.chain
   .put('session-ryan-1', { ... })
@@ -109,6 +111,18 @@ for(const { key, value } of sessions) {
   console.log(key,'=', value.toString()); // Returns all sessions from ryan
   // (Entries with prefixed key "session-ryan-")
 }
+```
+
+#### Reading in Stream
+The data can be processed as soon as it's available using `db.iterate()`. This consumes less memory and allows streamlining the data to downstream consumer, e.g. pipe to file system, network socket, or another leveldb instance.
+
+Unlike `db.stream()` which stores the data in memory and returns when the entire dataset is collected.
+```typescript
+const sessions = await db.iterate({ all: 'session-ryan-' })
+sessions.onData(data => {
+  console.log(data) // process the data one by one
+})
+await sessions.wait() // resolve when all data is iterated
 ```
 
 ### Extra functions
