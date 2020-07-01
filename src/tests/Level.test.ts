@@ -41,10 +41,12 @@ test('Chaining a dataset with chaining', () => {
 
 test('Streaming dataset', async () => {
   const keys = ['Data2', 'Data3', 'Data4'];
-  for (const data of await db.stream({
+  const dataset = await db.stream({
     gte: 'Data2',
     lte: 'Data4',
-  })) {
+  });
+  expect(dataset).toHaveLength(3);
+  for (const data of dataset) {
     expect(keys.includes(data.key)).toBeTruthy();
     expect(data.value).toMatchObject({ test: 'jest' });
   }
