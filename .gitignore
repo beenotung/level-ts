@@ -14,3 +14,7 @@ pnpm-lock.yaml
 
 # IDE files
 .idea/
+
+# Test report files
+junit.xml
+coverage/

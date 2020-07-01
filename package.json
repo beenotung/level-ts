@@ -23,7 +23,7 @@
     "typescript": "^3.4.5"
   },
   "scripts": {
-    "test": "tsc && jest",
+    "test": "tsc && jest --coverage",
     "start": "node --inspect=5858 -r ts-node/register ./src/App.ts",
     "start:dry": "node -r ts-node/register ./src/App.ts",
     "start:watch": "nodemon",
