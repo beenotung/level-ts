@@ -135,6 +135,19 @@ await db.put('first', { ... });
 await db.exists('first'); // true
 ```
 
+##### Count
+Returns number of dataset in the database
+```typescript
+await db.count() // 5
+```
+
+##### Reduce
+Returns the reduced value after iterate the database
+```typescript
+// count the total length of all keys
+await db.reduce((acc, c) => acc + c.length, 0, { values: false }) // 25
+```
+
 ##### Merge
 Merges the database entry with the given object. Returns the newly created object:
 ```typescript

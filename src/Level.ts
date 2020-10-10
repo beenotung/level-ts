@@ -163,6 +163,24 @@ export default class Level<DefaultType = any> {
     };
     return stream;
   }
+
+  public reduce<T, EntryType = DefaultType>(fn: (acc: T, current: string) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & { keys?: true, values: false }): Promise<T>;
+  public reduce<T, EntryType = DefaultType>(fn: (acc: T, current: EntryType) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & { keys: false, values?: true }): Promise<T>;
+  public reduce<T, EntryType = DefaultType>(fn: (acc: T, current: { key: string, value: EntryType }) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & { keys?: true, values?: true }): Promise<T>;
+  public reduce<T, EntryType = DefaultType>(fn: (acc: T, current: any) => any, initial: T, optionalOpts?: Partial<IStreamOptions>): Promise<T> {
+    const stream = this.iterate(optionalOpts as any);
+    stream.onData((data) => {
+      initial = fn(initial, data);
+    });
+    return stream.wait().then(() => initial);
+  }
+
+  public count(): Promise<number> {
+    const stream = this.iterate({ keys: true, values: false });
+    let count = 0;
+    stream.onData(() => count++ )
+    return stream.wait().then(() => count)
+  }
 }
 
 interface IStreamOptions {
