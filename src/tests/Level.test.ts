@@ -10,8 +10,11 @@ Level.setRoot('temp_test.local');
 // mkdirSync('temp_test.local');
 let db: Level<IObj>;
 
-test('Level database creation', () => {
+beforeAll(() => {
   db = new Level('level-db');
+})
+
+test('Level database creation', () => {
   return expect(db).toBeInstanceOf(Level);
 });
 
