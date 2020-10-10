@@ -35,12 +35,12 @@ test('Chaining a dataset with chaining', () => {
       .put('Data3', { test: 'jest-3' })
       .put('Data4', { test: 'jest-4' })
       .put('Data5', { test: 'jest-5' })
-      .finish()
+      .finish(),
   ).resolves.toBeDefined();
 });
 
 test('Streaming all dataset', async () => {
-return   expect(db.stream()).resolves.toHaveLength(5);
+  return expect(db.stream()).resolves.toHaveLength(5);
 });
 
 test('Streaming range of dataset', async () => {
@@ -82,7 +82,7 @@ test('Reading all dataset', async () => {
 });
 
 test('Find data', async () => {
-  return expect(db.find((value) => value.test.split('-')[1] >= '2')).resolves.toStrictEqual({test: 'jest-2'});
+  return expect(db.find((value) => value.test.split('-')[1] >= '2')).resolves.toStrictEqual({ test: 'jest-2' });
 });
 
 test('Filter dataset', async () => {
