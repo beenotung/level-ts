@@ -1,5 +1,15 @@
 {
+  "name": "@beenotung/level-ts",
   "version": "1.12.1",
+  "description": "The hard typed level module with some extra features",
+  "author": "Ryan <ryan@devdroplets.ga>",
+  "contributors": [
+    "Beeno Tung <aabbcc1241@yahoo.com.hk>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/beenotung/level-ts"
+  },
   "main": "./dist/App.js",
   "types": "./dist/App.d.ts",
   "dependencies": {
@@ -49,16 +59,6 @@
     "exec": "npm start",
     "ext": "ts"
   },
-  "name": "@beenotung/level-ts",
-  "description": "The hard typed level module with some extra features",
-  "author": "Ryan <ryan@devdroplets.ga>",
-  "contributors": [
-    "Beeno Tung <aabbcc1241@yahoo.com.hk>"
-  ],
-  "repository": {
-    "url": "https://github.com/beenotung/level-ts"
-  },
-  "license": "MIT",
   "keywords": [
     "typescript",
     "typing",
