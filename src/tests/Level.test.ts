@@ -1,5 +1,4 @@
 import Level from '../Level';
-import { rmdirSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 
 interface IObj {
