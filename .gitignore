@@ -1,5 +1,6 @@
 # Package files
 node_modules
+*.tgz
 
 # Lockfiles
 *.log

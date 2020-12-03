@@ -1,0 +1,17 @@
+# Package files
+*.tgz
+
+# Lockfiles
+pnpm-lock.yaml
+
+# CI/CD files
+.gitlab-ci.yml
+
+# Dev files
+tsconfig.json
+tslint.json
+jest.config.js
+
+# IDE files
+.idea/
+.vscode/
