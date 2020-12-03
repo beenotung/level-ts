@@ -14,6 +14,7 @@ pnpm-lock.yaml
 
 # IDE files
 .idea/
+.vscode/
 
 # Test report files
 junit.xml
