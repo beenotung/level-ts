@@ -49,6 +49,22 @@ export default class Level<DefaultType = any> {
         key: string;
         value: EntryType;
     }>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: string) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+    }): Promise<T>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: EntryType) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+    }): Promise<T>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: {
+        key: string;
+        value: EntryType;
+    }) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+    }): Promise<T>;
+    count(): Promise<number>;
 }
 interface IStreamOptions {
     /**define the lower bound of the range to be streamed. Only entries where the key is greater than (or equal to) this option will be included in the range. When reverse=true the order will be reversed, but the entries streamed will be the same. */

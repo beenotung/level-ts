@@ -132,6 +132,19 @@ class Level {
         };
         return stream;
     }
+    reduce(fn, initial, optionalOpts) {
+        const stream = this.iterate(optionalOpts);
+        stream.onData((data) => {
+            initial = fn(initial, data);
+        });
+        return stream.wait().then(() => initial);
+    }
+    count() {
+        const stream = this.iterate({ keys: true, values: false });
+        let count = 0;
+        stream.onData(() => count++);
+        return stream.wait().then(() => count);
+    }
 }
 exports.default = Level;
 Level.rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();

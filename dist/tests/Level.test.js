@@ -8,8 +8,10 @@ const path_1 = require("path");
 Level_1.default.setRoot('temp_test.local');
 // mkdirSync('temp_test.local');
 let db;
-test('Level database creation', () => {
+beforeAll(() => {
     db = new Level_1.default('level-db');
+});
+test('Level database creation', () => {
     return expect(db).toBeInstanceOf(Level_1.default);
 });
 test('Writing data - .put( test, { test: \'jest\' } )', () => {
@@ -82,5 +84,20 @@ test('Using an already created db inside constructor', async () => {
     const database = require('level')(path_1.resolve('temp_test.local', 'level-db-2'));
     const instance = new Level_1.default(database);
     return expect(instance.put('fuck', 'you')).resolves.toBe('you');
+});
+test('Count number of data in dataset', async () => {
+    const keys = await db.stream({ values: false });
+    return expect(db.count()).resolves.toBe(keys.length);
+});
+test('Run reduce on dataset', async () => {
+    const dataset = await db.stream();
+    const keys = dataset.map(data => data.key);
+    const values = dataset.map(data => data.value);
+    const collect = (array, value) => {
+        array.push(value);
+        return array;
+    };
+    await expect(db.reduce(collect, [], { values: false })).resolves.toEqual(keys);
+    await expect(db.reduce(collect, [], { keys: false })).resolves.toEqual(values);
 });
 //# sourceMappingURL=Level.test.js.map
