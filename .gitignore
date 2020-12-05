@@ -12,6 +12,7 @@ pnpm-lock.yaml
 # dist
 *.local
 .yarnrc
+*.orig
 
 # IDE files
 .idea/
