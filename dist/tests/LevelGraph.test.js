@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const LevelGraph_1 = require("../LevelGraph");
 const fs_1 = require("fs");
 LevelGraph_1.LevelGraph.setRoot('temp_test.local');
+// tslint:disable-next-line no-empty
 try {
     fs_1.mkdirSync('temp_test.local');
 }

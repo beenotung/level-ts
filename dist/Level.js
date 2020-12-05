@@ -1,6 +1,25 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
+const path = __importStar(require("path"));
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires
 const level = require('level');
@@ -8,7 +27,7 @@ const instances = {};
 class Level {
     constructor(argument) {
         if (typeof argument === 'string') {
-            const fullpath = path_1.isAbsolute(argument) ? argument : path_1.resolve(Level.rootFolder, argument);
+            const fullpath = path.isAbsolute(argument) ? argument : path.resolve(Level.rootFolder, argument);
             this.DB = instances[fullpath]
                 ? instances[fullpath]
                 : instances[fullpath] = level(fullpath);
@@ -20,8 +39,8 @@ class Level {
             throw new Error('No valid database instance or path provided');
         }
     }
-    static setRoot(path) {
-        this.rootFolder = path;
+    static setRoot(dir) {
+        this.rootFolder = dir;
     }
     async find(func) {
         return new Promise((resolver, reject) => {
@@ -94,6 +113,78 @@ class Level {
         stream.onData((data) => returnArray.push(data));
         return stream.wait().then(() => returnArray);
     }
+    eachSync(opts) {
+        return new Promise((resolve, reject) => {
+            const eachFn = opts.eachFn;
+            const stream = this.iterate(opts);
+            let ended = false;
+            stream.onData((data) => {
+                if (ended) {
+                    return;
+                }
+                try {
+                    const result = eachFn(data);
+                    if (result === 'break') {
+                        ended = true;
+                        resolve();
+                        stream.close();
+                        return;
+                    }
+                }
+                catch (e) {
+                    reject(e);
+                    stream.close();
+                }
+            });
+            stream.wait()
+                .then(() => {
+                ended = true;
+                resolve();
+            })
+                .catch(reject);
+        });
+    }
+    eachAsync(opts) {
+        return new Promise((resolve, reject) => {
+            const eachFn = opts.eachFn;
+            const stream = this.iterate(opts);
+            let n = 0;
+            let i = 0;
+            let ended = false;
+            function checkEnd() {
+                if (n === i && ended) {
+                    resolve();
+                }
+            }
+            stream.onData((data) => {
+                if (ended) {
+                    return;
+                }
+                n++;
+                eachFn(data)
+                    .then((result) => {
+                    i++;
+                    if (result === 'break') {
+                        ended = true;
+                        resolve();
+                        stream.close();
+                        return;
+                    }
+                    checkEnd();
+                })
+                    .catch((e) => {
+                    stream.close();
+                    reject(e);
+                });
+            });
+            stream.wait()
+                .then(() => {
+                ended = true;
+                checkEnd();
+            })
+                .catch(reject);
+        });
+    }
     iterate(optionalOpts) {
         const opts = optionalOpts || {};
         if (opts.all)
@@ -131,6 +222,19 @@ class Level {
             },
         };
         return stream;
+    }
+    reduce(fn, initial, optionalOpts) {
+        const stream = this.iterate(optionalOpts);
+        stream.onData((data) => {
+            initial = fn(initial, data);
+        });
+        return stream.wait().then(() => initial);
+    }
+    count() {
+        const stream = this.iterate({ keys: true, values: false });
+        let count = 0;
+        stream.onData(() => count++);
+        return stream.wait().then(() => count);
     }
 }
 exports.default = Level;

@@ -6,7 +6,7 @@ interface IChainObject<DefaultType> {
 }
 export default class Level<DefaultType = any> {
     static rootFolder: string;
-    static setRoot(path: string): void;
+    static setRoot(dir: string): void;
     private DB;
     constructor(database: object);
     constructor(path: string);
@@ -34,6 +34,47 @@ export default class Level<DefaultType = any> {
         key: string;
         value: EntryType;
     }>>;
+    eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+        eachFn: (key: string) => 'break' | void;
+    }): Promise<void>;
+    eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+        eachFn: (value: EntryType) => 'break' | void;
+    }): Promise<void>;
+    eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+        eachFn: (entry: {
+            key: string;
+            value: EntryType;
+        }) => 'break' | void;
+    }): Promise<void>;
+    /**
+     *  @remark Does NOT guarantee no further calls on eachFn after returning 'break'.
+     *          This limitation is due to batched call on eachFn for potential better performance (concurrent utility).
+     *          (Because the calls to eachFn is not queued.)
+     * */
+    eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+        eachFn: (key: string) => Promise<'break' | void>;
+    }): Promise<void>;
+    eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+        eachFn: (value: EntryType) => Promise<'break' | void>;
+    }): Promise<void>;
+    eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+        eachFn: (entry: {
+            key: string;
+            value: EntryType;
+        }) => Promise<'break' | void>;
+    }): Promise<void>;
     iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & {
         keys?: true;
         values: false;
@@ -49,6 +90,22 @@ export default class Level<DefaultType = any> {
         key: string;
         value: EntryType;
     }>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: string) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys?: true;
+        values: false;
+    }): Promise<T>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: EntryType) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys: false;
+        values?: true;
+    }): Promise<T>;
+    reduce<T, EntryType = DefaultType>(fn: (acc: T, current: {
+        key: string;
+        value: EntryType;
+    }) => any, initial: T, optionalOpts?: Partial<IStreamOptions> & {
+        keys?: true;
+        values?: true;
+    }): Promise<T>;
+    count(): Promise<number>;
 }
 interface IStreamOptions {
     /**define the lower bound of the range to be streamed. Only entries where the key is greater than (or equal to) this option will be included in the range. When reverse=true the order will be reversed, but the entries streamed will be the same. */
