@@ -11,7 +11,7 @@ let db: Level<IObj>;
 
 beforeAll(() => {
   db = new Level('level-db');
-})
+});
 
 test('Level database creation', () => {
   return expect(db).toBeInstanceOf(Level);
@@ -37,7 +37,7 @@ test('Chaining a dataset with chaining', () => {
       .put('Data3', { test: 'jest-3' })
       .put('Data4', { test: 'jest-4' })
       .put('Data5', { test: 'jest-5' })
-      .finish(),
+      .finish()
   ).resolves.toBeDefined();
 });
 
@@ -103,18 +103,18 @@ test('Using an already created db inside constructor', async () => {
 });
 
 test('Count number of data in dataset', async () => {
-  const keys = await db.stream({ values: false })
-  return expect(db.count()).resolves.toBe(keys.length)
+  const keys = await db.stream({ values: false });
+  return expect(db.count()).resolves.toBe(keys.length);
 });
 
 test('Run reduce on dataset', async () => {
-  const dataset = await db.stream()
-  const keys = dataset.map(data => data.key)
-  const values = dataset.map(data => data.value)
+  const dataset = await db.stream();
+  const keys = dataset.map((data) => data.key);
+  const values = dataset.map((data) => data.value);
   const collect = (array: string[], value: string) => {
-    array.push(value)
-    return array
-  }
-  await expect(db.reduce(collect, [], { values: false })).resolves.toEqual(keys)
-  await expect(db.reduce(collect, [], { keys: false })).resolves.toEqual(values)
-})
+    array.push(value);
+    return array;
+  };
+  await expect(db.reduce(collect, [], { values: false })).resolves.toEqual(keys);
+  await expect(db.reduce(collect, [], { keys: false })).resolves.toEqual(values);
+});

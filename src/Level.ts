@@ -179,8 +179,8 @@ export default class Level<DefaultType = any> {
   public count(): Promise<number> {
     const stream = this.iterate({ keys: true, values: false });
     let count = 0;
-    stream.onData(() => count++ )
-    return stream.wait().then(() => count)
+    stream.onData(() => count++);
+    return stream.wait().then(() => count);
   }
 }
 
@@ -206,7 +206,7 @@ interface IStreamOptions {
   values: boolean;
 }
 
-type TerminateReason= 'end' | 'cancel';
+type TerminateReason = 'end' | 'cancel';
 
 interface IStream<T> {
   close(): void; // early terminate the iteration
