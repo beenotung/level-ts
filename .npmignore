@@ -20,3 +20,9 @@ pnpm-lock.yaml
 # Test report files
 junit.xml
 coverage/
+
+# Dev files
+.gitlab-ci.yml
+tsconfig.json
+tslint.json
+jest.config.js
