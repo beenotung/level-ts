@@ -1,4 +1,4 @@
-import { resolve, isAbsolute } from 'path';
+import * as path from 'path';
 
 // tslint:disable: jsdoc-format
 // tslint:disable-next-line: no-var-requires
@@ -17,8 +17,9 @@ interface IChainObject<DefaultType> {
 
 export default class Level<DefaultType = any> {
   public static rootFolder = process.env.DATABASES || process.env.DATABASES_ROOT || process.cwd();
-  public static setRoot(path: string) {
-    this.rootFolder = path;
+
+  public static setRoot(dir: string) {
+    this.rootFolder = dir;
   }
 
   private DB: any;
@@ -28,7 +29,7 @@ export default class Level<DefaultType = any> {
   constructor(path: string)
   constructor(argument: string | any) {
     if (typeof argument === 'string') {
-      const fullpath = isAbsolute(argument) ? argument : resolve(Level.rootFolder, argument);
+      const fullpath = path.isAbsolute(argument) ? argument : path.resolve(Level.rootFolder, argument);
       this.DB = instances[fullpath]
         ? instances[fullpath]
         : instances[fullpath] = level(fullpath);

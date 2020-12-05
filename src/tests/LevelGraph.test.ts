@@ -2,6 +2,7 @@ import { LevelGraph } from '../LevelGraph';
 import { mkdirSync } from 'fs';
 
 LevelGraph.setRoot('temp_test.local');
+// tslint:disable-next-line no-empty
 try { mkdirSync('temp_test.local'); } catch (e) { }
 const db = new LevelGraph('levelgraph-db');
 

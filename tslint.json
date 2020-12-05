@@ -22,6 +22,7 @@
   "linterOptions": {},
   "jsRules": true,
   "rules": {
+    "unified-signatures": false,
     "trailing-comma": [
       true,
       {
