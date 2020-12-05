@@ -118,3 +118,69 @@ test('Run reduce on dataset', async () => {
   await expect(db.reduce(collect, [], { values: false })).resolves.toEqual(keys);
   await expect(db.reduce(collect, [], { keys: false })).resolves.toEqual(values);
 });
+
+test('level.eachSync on dataset', async () => {
+  const dataset = await db.stream();
+  const keys = dataset.map((data) => data.key);
+  const values = dataset.map((data) => data.value);
+
+  const seenKeys: typeof keys = [];
+  await db.eachSync({ values: false, eachFn: (key) => { seenKeys.push(key); }});
+  expect(seenKeys).toEqual(keys);
+
+  const seenValues: typeof values = [];
+  await db.eachSync({ keys: false, eachFn: (value) => { seenValues.push(value); }});
+  expect(seenValues).toEqual(values);
+
+  const seenData: typeof dataset = [];
+  await db.eachSync({ eachFn: (data) => { seenData.push(data); }});
+  expect(seenData).toEqual(dataset);
+});
+
+test('level.eachAsync on dataset', async () => {
+  const dataset = await db.stream();
+  const keys = dataset.map((data) => data.key);
+  const values = dataset.map((data) => data.value);
+
+  const seenKeys: typeof keys = [];
+  await db.eachAsync({ values: false, eachFn: async (key) => { seenKeys.push(key); }});
+  expect(seenKeys).toEqual(keys);
+
+  const seenValues: typeof values = [];
+  await db.eachAsync({ keys: false, eachFn: async (value) => { seenValues.push(value); }});
+  expect(seenValues).toEqual(values);
+
+  const seenData: typeof dataset = [];
+  await db.eachAsync({ eachFn: async (data) => { seenData.push(data); }});
+  expect(seenData).toEqual(dataset);
+});
+
+test('break level.eachSync', async () => {
+  let dataset = await db.stream()
+  expect(dataset.length).toBe(5)
+  let n = 0
+  let target = 3
+  function eachFn() {
+    n++
+    if (n === target) {
+      return 'break'
+    }
+  }
+  await db.eachSync({ eachFn })
+  expect(n).toBe(target)
+})
+
+test('break level.eachASync', async () => {
+  let dataset = await db.stream()
+  expect(dataset.length).toBe(5)
+  let n = 0
+  let target = 3
+  async function eachFn() {
+    n++
+    if (n === target) {
+      return 'break'
+    }
+  }
+  await db.eachAsync({ eachFn })
+  expect(n).toBeGreaterThanOrEqual(target)
+})

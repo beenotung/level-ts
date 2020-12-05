@@ -124,6 +124,95 @@ export default class Level<DefaultType = any> {
     return stream.wait().then(() => returnArray);
   }
 
+  public eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values: false, eachFn: (key: string) => 'break' | void }): Promise<void>;
+  public eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false, values?: true, eachFn: (value: EntryType) => 'break' | void }): Promise<void>;
+  public eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values?: true, eachFn: (entry: { key: string, value: EntryType }) => 'break' | void }): Promise<void>;
+  public eachSync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: boolean, values?: boolean, eachFn: (data: any) => 'break' | void }): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const eachFn = opts.eachFn;
+      const stream = this.iterate(opts as any);
+      let ended = false;
+
+      stream.onData((data) => {
+        if (ended) {
+          return
+        }
+        try {
+          const result = eachFn(data);
+          if (result === 'break') {
+            ended = true
+            resolve();
+            stream.close();
+            return;
+          }
+        } catch (e) {
+          reject(e);
+          stream.close();
+        }
+      });
+
+      stream.wait()
+        .then(() => {
+          ended = true;
+          resolve()
+        })
+        .catch(reject);
+    });
+  }
+
+  /**
+   *  @remark Does NOT guarantee no further calls on eachFn after returning 'break'.
+   *          This limitation is due to batched call on eachFn for potential better performance (concurrent utility).
+   *          (Because the calls to eachFn is not queued.)
+   * */
+  public eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values: false, eachFn: (key: string) => Promise<'break' | void> }): Promise<void>;
+  public eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false, values?: true, eachFn: (value: EntryType) => Promise<'break' | void> }): Promise<void>;
+  public eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values?: true, eachFn: (entry: { key: string, value: EntryType }) => Promise<'break' | void> }): Promise<void>;
+  public eachAsync<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: boolean, values?: boolean, eachFn: (data: any) => Promise<'break' | void> }): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const eachFn = opts.eachFn;
+      const stream = this.iterate(opts as any);
+      let n = 0;
+      let i = 0;
+      let ended = false;
+
+      function checkEnd() {
+        if (n === i && ended) {
+          resolve();
+        }
+      }
+
+      stream.onData((data) => {
+        if (ended) {
+          return
+        }
+        n++;
+        eachFn(data)
+          .then((result) => {
+            i++;
+            if (result === 'break') {
+              ended = true
+              resolve();
+              stream.close();
+              return;
+            }
+            checkEnd();
+          })
+          .catch((e) => {
+            stream.close();
+            reject(e);
+          });
+      });
+
+      stream.wait()
+        .then(() => {
+          ended = true;
+          checkEnd();
+        })
+        .catch(reject);
+    });
+  }
+
   public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true, values: false }): IStream<string>;
   public iterate<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false, values?: true }): IStream<EntryType>;
   public iterate<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true, values?: true }): IStream<{ key: string, value: EntryType }>;
@@ -212,4 +301,5 @@ interface IStream<T> {
   close(): void; // early terminate the iteration
   onData(cb: (data: T) => void): void;
   wait(): Promise<TerminateReason>; // resolve when ended, with reason
+
 }

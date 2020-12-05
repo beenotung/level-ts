@@ -117,12 +117,41 @@ for(const { key, value } of sessions) {
 The data can be processed as soon as it's available using `db.iterate()`. This consumes less memory and allows streamlining the data to downstream consumer, e.g. pipe to file system, network socket, or another leveldb instance.
 
 Unlike `db.stream()` which stores the data in memory and returns when the entire dataset is collected.
+
+Example of `db.iterate()`:
 ```typescript
 const sessions = await db.iterate({ all: 'session-ryan-' })
 sessions.onData(data => {
   console.log(data) // process the data one by one
 })
 await sessions.wait() // resolve when all data is iterated
+```
+
+If you simply want to iterate the dataset, and await until all data is iterated, you can use `db.eachSync()` and `db.eachAsync()`.
+
+Above example can be simplified as below:
+```typescript
+await db.eachSync({
+  all: 'session-ryan-',
+  eachFn: data => {
+    console.log(data) // process the data one by one
+  }
+})  // resolve when all data is iterated
+```
+
+Or as below if each callback is async function:
+```typescript
+await db.eachAsync({
+  all: 'session-ryan-',
+  eachFn: async data =>
+    // process the data one by one (concurrently)
+    fetch('/downstream', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+})  // resolve when all data is iterated
 ```
 
 ### Extra functions
