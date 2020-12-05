@@ -9,7 +9,7 @@ package-*
 pnpm-lock.yaml
 
 # Local files
-# dist
+dist
 *.local
 .yarnrc
 *.orig
