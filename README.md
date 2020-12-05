@@ -1,5 +1,8 @@
 # Level-ts typescript wrapper
-A leveldb force promises, class, JSON and typescript implementing wrapper.
+
+[![npm Package Version](https://img.shields.io/npm/v/@beenotung/level-ts.svg?maxAge=3600)](https://www.npmjs.com/package/@beenotung/level-ts)
+
+A leveldb force promises, class, JSON and typescript implementing wrapper (with extra helper methods).
 This can replace your current level database instance exactly, but with typescript returning and functions typing support:
 
 
