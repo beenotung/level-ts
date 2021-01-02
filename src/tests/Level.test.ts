@@ -45,6 +45,12 @@ test('Streaming all dataset', async () => {
   return expect(db.stream()).resolves.toHaveLength(5);
 });
 
+test('Streaming all keys', async () => {
+  const entries = await db.stream()
+  const keys = await db.keys()
+  expect(keys).toEqual(entries.map(({key})=>key))
+})
+
 test('Streaming range of dataset', async () => {
   const keys = ['Data2', 'Data3', 'Data4'];
   const dataset = await db.stream({

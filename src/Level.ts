@@ -114,6 +114,10 @@ export default class Level<DefaultType = any> {
     return this.stream<EntryType>({ keys: false });
   }
 
+  public async keys(): Promise<string[]> {
+    return this.stream({ keys: true, values: false });
+  }
+
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys?: true; values: false }): Promise<string[]>;
   public stream<EntryType = DefaultType>(opts: Partial<IStreamOptions> & { keys: false; values?: true }): Promise<EntryType[]>;
   public stream<EntryType = DefaultType>(opts?: Partial<IStreamOptions> & { keys?: true; values?: true }): Promise<Array<{ key: string; value: EntryType }>>;
